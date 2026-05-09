@@ -1,26 +1,44 @@
 @import "tailwindcss";
+@import "./design-tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* The data-brand attribute drives the OEM-color inheritance system.
+   See DESIGN.md "Notes on token usage" for why we apply per-card via
+   CSS custom properties rather than declared component variants. */
+[data-brand="pentair"]    { --brand-accent: var(--color-pentair);    --brand-soft: var(--color-pentair-soft); }
+[data-brand="hayward"]    { --brand-accent: var(--color-hayward);    --brand-soft: var(--color-hayward-soft); }
+[data-brand="polaris"]    { --brand-accent: var(--color-polaris);    --brand-soft: var(--color-polaris-soft); }
+[data-brand="jandy"]      { --brand-accent: var(--color-jandy);      --brand-soft: #FBE0E5; }
+[data-brand="raypak"]     { --brand-accent: var(--color-raypak);     --brand-soft: #FBE0DD; }
+[data-brand="leslies"]    { --brand-accent: var(--color-leslies);    --brand-soft: var(--color-leslies-soft); }
+[data-brand="suncountry"] { --brand-accent: var(--color-suncountry); --brand-soft: var(--color-suncountry-soft); }
+[data-brand="pinch"]      { --brand-accent: var(--color-pinch);      --brand-soft: var(--color-marina-soft); }
+[data-brand="marina"]     { --brand-accent: var(--color-marina);     --brand-soft: var(--color-marina-soft); }
+
+/* per-business pro brand colors (each independent business carries its own) */
+[data-brand="foothill"]   { --brand-accent: #4D6B50; --brand-soft: #E2EAE3; }
+[data-brand="bluedrop"]   { --brand-accent: #1F5C8B; --brand-soft: var(--color-pentair-soft); }
+[data-brand="ridgeline"]  { --brand-accent: #B85541; --brand-soft: #F4DDD4; }
+[data-brand="westshore"]  { --brand-accent: #4D6B50; --brand-soft: #E2EAE3; }
+[data-brand="plaster"]    { --brand-accent: #8A6A1D; --brand-soft: #F0E5C8; }
+[data-brand="heater"]     { --brand-accent: #1A4F8B; --brand-soft: var(--color-pentair-soft); }
+[data-brand="capleak"]    { --brand-accent: #1F5C8B; --brand-soft: var(--color-pentair-soft); }
+
+/* source-of-record (used on rows, dots, pills) */
+[data-src="live"]      { --src-accent: var(--color-source-live);     --src-soft: #DCEDE0; }
+[data-src="imported"]  { --src-accent: var(--color-source-imported); --src-soft: var(--color-suncountry-soft); }
+[data-src="human"]     { --src-accent: var(--color-source-human);    --src-soft: #F8E2DD; }
+[data-src="ai"]        { --src-accent: var(--color-source-ai);       --src-soft: var(--color-primary-soft); }
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: var(--font-inter-tight, "Inter Tight"), system-ui, sans-serif;
+  background: var(--color-background);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum";
+  line-height: 1.5;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+*, *::before, *::after { box-sizing: border-box; }

@@ -1,0 +1,77 @@
+/* AUTO-GENERATED from DESIGN.md — do not edit by hand. */
+/* Run: npm run design:tokens */
+
+@theme {
+  /* colors */
+  --color-background: #FFFFFF;
+  --color-surface: #FAFAFA;
+  --color-surface-2: #F5F5F4;
+  --color-line: #ECECEC;
+  --color-line-2: #D8D8D8;
+  --color-ink: #0F1115;
+  --color-ink-soft: #45494F;
+  --color-ink-mute: #6B7079;
+  --color-on-ink: #FFFFFF;
+  --color-primary: #1FA0BF;
+  --color-primary-soft: #E2F3F8;
+  --color-on-primary: #FFFFFF;
+  --color-source-live: #2A8540;
+  --color-source-imported: #B07B00;
+  --color-source-human: #C75240;
+  --color-source-ai: #1FA0BF;
+  --color-pentair: #1A4F8B;
+  --color-pentair-soft: #E5ECF4;
+  --color-hayward: #D8A700;
+  --color-hayward-soft: #FBF1D0;
+  --color-polaris: #00759C;
+  --color-polaris-soft: #DCEDF4;
+  --color-jandy: #CC0033;
+  --color-raypak: #E94B3C;
+  --color-leslies: #0046A8;
+  --color-leslies-soft: #DEE8F7;
+  --color-suncountry: #B07B00;
+  --color-suncountry-soft: #F8EFD6;
+  --color-pinch: #2C5F4A;
+  --color-marina: #2C5F4A;
+  --color-marina-soft: #DFE8E2;
+  --color-success: #2A8540;
+  --color-warn: #B07B00;
+  --color-error: #C75240;
+
+  /* typography (font-size pairs and font-family) */
+  --text-display: 44px, 1.02, 800, -0.04em;
+  --text-headline-lg: 32px, 1.05, 800, -0.04em;
+  --text-headline-md: 22px, 1.15, 700, -0.03em;
+  --text-headline-sm: 17px, 1.15, 700, -0.02em;
+  --text-stat-lg: 32px, 1, 800, -0.04em;
+  --text-stat-md: 22px, 1, 700, -0.03em;
+  --text-body-lg: 16px, 1.5, 500, -0.005em;
+  --text-body-md: 15px, 1.5, 400;
+  --text-body-sm: 13px, 1.4, 500, -0.005em;
+  --text-caption: 12px, 1.4, 500;
+  --text-label-caps: 11px, 1, 600, 0.04em;
+  --font-inter-tight: "Inter Tight", system-ui, sans-serif;
+  --font-sans: "Inter Tight", system-ui, sans-serif;
+
+  /* spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 28px;
+  --spacing-xl: 56px;
+  --spacing-page-margin: 32px;
+  --spacing-max-width: 1280px;
+  --spacing-gutter: 16px;
+  --spacing-card-padding: 22px;
+  --spacing-card-padding-lg: 28px;
+  --spacing-section-gap: 56px;
+
+  /* rounded */
+  --radius-none: 0px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+}
