@@ -6,7 +6,6 @@ type Tone = "live" | "human" | "imported" | "ai";
 type Hotspot = {
   id: string;
   label: string;
-  subline: string;
   href: string;
   x: number;
   y: number;
@@ -22,8 +21,7 @@ const HOTSPOTS: Hotspot[] = [
     y: 48,
     w: 26,
     h: 28,
-    label: "Today's water",
-    subline: "pH 7.4 · ORP 720",
+    label: "Today's water · pH 7.4",
     href: "/care",
     tone: "ai",
   },
@@ -33,8 +31,7 @@ const HOTSPOTS: Hotspot[] = [
     y: 64,
     w: 28,
     h: 32,
-    label: "The pad",
-    subline: "5 units · all live",
+    label: "The pad · 5 units live",
     href: "/equipment",
     tone: "live",
   },
@@ -44,8 +41,7 @@ const HOTSPOTS: Hotspot[] = [
     y: 34,
     w: 18,
     h: 22,
-    label: "Maya is here",
-    subline: "tap to ping",
+    label: "Maya is here · tap to ping",
     href: "/care",
     tone: "human",
   },
@@ -56,7 +52,6 @@ const HOTSPOTS: Hotspot[] = [
     w: 22,
     h: 20,
     label: "Carlos · 4 mins up the street",
-    subline: "routes nearby",
     href: "/folks",
     tone: "human",
   },
@@ -67,7 +62,6 @@ const HOTSPOTS: Hotspot[] = [
     w: 16,
     h: 30,
     label: "Leslie's · 2 mi · in stock",
-    subline: "tap to browse",
     href: "/folks",
     tone: "imported",
   },
@@ -83,29 +77,36 @@ const TONE_COLOR: Record<Tone, string> = {
 export default function CanvasPage() {
   return (
     <div className="relative w-full bg-ink overflow-x-auto overflow-y-hidden h-[calc(100dvh-96px)] md:h-[calc(100dvh-72px)]">
-      <div className="flex h-full items-center justify-center min-w-fit">
+      <div className="relative h-full w-[1400px] md:w-full md:max-w-[1920px] mx-auto">
         <div
-          className="relative h-full shrink-0"
-          style={{ aspectRatio: "16/10", minWidth: 1400 }}
+          className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center"
+          aria-hidden
         >
-          <div
-            className="absolute inset-0 bg-no-repeat bg-cover bg-center"
-            style={{
-              backgroundImage: "url(/assets/canvas/backyard-macro.png)",
-              imageRendering: "pixelated",
-            }}
-            aria-hidden
-          />
-
-          {HOTSPOTS.map((spot) => (
-            <HotspotChip key={spot.id} spot={spot} />
-          ))}
+          <span className="text-white/35 text-sm tracking-wide text-center px-6">
+            Drop the backyard image at{" "}
+            <code className="font-mono text-white/60 bg-white/5 px-2 py-0.5 rounded">
+              public/assets/canvas/backyard-macro.png
+            </code>
+          </span>
         </div>
+
+        <div
+          className="absolute inset-0 z-10 bg-no-repeat bg-cover bg-center"
+          style={{
+            backgroundImage: "url(/assets/canvas/backyard-macro.png)",
+            imageRendering: "pixelated",
+          }}
+          aria-hidden
+        />
+
+        {HOTSPOTS.map((spot) => (
+          <HotspotChip key={spot.id} spot={spot} />
+        ))}
       </div>
 
-      <div className="md:hidden pointer-events-none fixed top-4 right-4 z-20">
+      <div className="md:hidden pointer-events-none fixed top-4 right-4 z-30">
         <span className="rounded-full bg-ink/85 backdrop-blur-sm text-white text-[10px] uppercase tracking-[0.12em] font-bold px-3 py-1.5">
-          Scroll the world
+          Scroll the world →
         </span>
       </div>
     </div>
@@ -118,7 +119,7 @@ function HotspotChip({ spot }: { spot: Hotspot }) {
     <Link
       href={spot.href}
       aria-label={spot.label}
-      className="group absolute flex flex-col items-center justify-end p-2"
+      className="group absolute z-20 flex flex-col items-center justify-end p-2"
       style={{
         left: `${spot.x}%`,
         top: `${spot.y}%`,
@@ -127,7 +128,7 @@ function HotspotChip({ spot }: { spot: Hotspot }) {
       }}
     >
       <span
-        className="absolute inset-2 rounded-3xl border-2 border-white/0 group-hover:border-white/80 group-hover:bg-white/[0.08] transition-all duration-200"
+        className="absolute inset-2 rounded-3xl border-2 border-white/30 group-hover:border-white/90 group-hover:bg-white/[0.08] transition-all duration-200"
         aria-hidden
       />
       <span
@@ -136,7 +137,7 @@ function HotspotChip({ spot }: { spot: Hotspot }) {
         aria-hidden
       />
 
-      <span className="relative z-10 inline-flex items-center gap-2 rounded-full bg-ink/85 backdrop-blur-sm px-3 py-1.5 text-white text-[12px] font-semibold leading-none translate-y-1 group-hover:translate-y-0 transition-transform shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+      <span className="relative z-10 inline-flex items-center gap-2 rounded-full bg-ink/90 backdrop-blur-sm border border-white/15 px-3 py-1.5 text-white text-[12px] font-semibold leading-none translate-y-1 group-hover:translate-y-0 transition-transform shadow-[0_4px_12px_rgba(0,0,0,0.45)]">
         <span
           className="h-2 w-2 rounded-full shrink-0"
           style={{ backgroundColor: color }}
