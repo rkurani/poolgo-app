@@ -196,9 +196,26 @@ All of it. Every detail page, every list, every tab. Components we've already bu
 4. **Macro-zoom visual treatment.** Pixelated icons (Ravi's instinct — playful, distinctive) vs. flat illustration vs. real top-down satellite of the property. Pixelated needs a commissioned icon set; satellite needs Mapbox + per-property art direction.
 5. **Visual system parity.** The canvas's background, line treatment, and pin colors must play with the Pure / warm-cream language Iter 2 is heading toward. They aren't independent decisions.
 
+### Evolution — 2026-05-10 (afternoon)
+
+After generating a first macro view via AI image gen inside Pencil, three new directional ideas emerged that we want to lock in:
+
+1. **Photo-to-world as the onboarding feature.** The homeowner takes a photo (or several) of their actual property — pool, pad, deck, surroundings. The app uses image understanding to detect equipment, layout, and surroundings, then *generates the Sims-style canvas of their specific home* as the My Pool surface. This becomes a first-run feature with real wow factor: "your pool, but as a living world." It's also a defensible product wedge — no other pool app has reason to build this.
+
+2. **Sims-meets-app as the conceptual frame.** Not "an app with a fancy background" — an actual living world that happens to be functional. The leaf detail pages (chemistry, equipment, schedule) are the utility layer; the canvas is where you live the rest of the time. This reframes the canvas from "navigation gimmick" to "ambient companion."
+
+3. **Lofi-girl ambient animation.** The canvas isn't static. Subtle animation loops give the world life: the figure on the lounger takes a sip, a bird flies across, palm fronds shift, the pool surface ripples. Reference: the lofi-girl YouTube channel (`lofi-girl`) — a single illustrated scene that loops indefinitely with quiet motion, designed to be left on. The PoolGo canvas should feel like that. You'd leave it open on a kitchen iPad.
+
+### Visual treatment — two distinct references, do not conflate
+
+- **Visual fidelity = FlipBook pixel art.** Low-fidelity, distinctly pixelated, 16-bit RPG-map energy (Stardew Valley, Owlboy, Hyper Light Drifter). Visible pixels are a feature. Not painterly, not photoreal, not Ghibli-illustrated. The Paris demo video in `inspo/ParisExampleVideo.mp4` is the reference for *how it should look*.
+- **Ambient motion = lofi girl.** The lofi-girl YouTube channel is the reference for *how it should move* — quiet looped ambient animation that makes a static scene feel alive (figure takes a sip, bird crosses, water ripples, palm fronds shift). It is **not** a visual-style reference.
+
+Conflating these two produces a polished cartoon (which the first regen drifted toward). The right destination is pixelated visuals + lofi-style ambient motion.
+
 ### Status
 
-Concept only. No code on the canvas direction yet. Next move: pick (a) outer-ring content, (b) macro-zoom visual treatment, then (c) sketch in Pencil before any TSX.
+Concept exploring. First macro AI image rendered in Pencil (frame `m3DaR` in `poolgo.pen`); regenerating with the lofi-girl direction. Photo-to-world onboarding still vapor — needs an image-understanding spike to validate feasibility (probably Claude Vision or Gemini for the detection pass; the world-build is the same image-gen pipeline). Animation layer is straight CSS / Lottie / Rive once the still frame lands.
 
 ---
 
