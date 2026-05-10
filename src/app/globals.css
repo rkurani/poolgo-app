@@ -61,6 +61,67 @@ button { font-family: inherit; cursor: pointer; }
   animation: pixelFloat 6s ease-in-out infinite;
 }
 
+/* Ambient canvas motion — lofi-girl-style background life.
+   Sprites are inline SVGs positioned absolutely, drifting on long loops. */
+
+@keyframes flyLeftToRight {
+  0%   { transform: translateX(0) translateY(0); }
+  25%  { transform: translateX(35vw) translateY(-12px); }
+  50%  { transform: translateX(70vw) translateY(4px); }
+  75%  { transform: translateX(105vw) translateY(-8px); }
+  100% { transform: translateX(140vw) translateY(0); }
+}
+.animate-flyLR {
+  animation: flyLeftToRight 26s linear infinite;
+}
+
+@keyframes flyRightToLeft {
+  0%   { transform: translateX(0) translateY(0) scaleX(-1); }
+  25%  { transform: translateX(-35vw) translateY(8px) scaleX(-1); }
+  50%  { transform: translateX(-70vw) translateY(-5px) scaleX(-1); }
+  75%  { transform: translateX(-105vw) translateY(6px) scaleX(-1); }
+  100% { transform: translateX(-140vw) translateY(0) scaleX(-1); }
+}
+.animate-flyRL {
+  animation: flyRightToLeft 34s linear infinite;
+}
+
+@keyframes walkRightToLeft {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-130vw); }
+}
+.animate-walkRL {
+  animation: walkRightToLeft 48s linear infinite;
+}
+
+@keyframes walkLeftToRight {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(130vw); }
+}
+.animate-walkLR {
+  animation: walkLeftToRight 62s linear infinite;
+}
+
+@keyframes floatBob {
+  0%   { transform: translateY(0) rotate(0deg); }
+  25%  { transform: translateY(-2px) rotate(1.5deg); }
+  50%  { transform: translateY(0) rotate(0deg); }
+  75%  { transform: translateY(2px) rotate(-1.5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+.animate-floatBob {
+  animation: floatBob 5.5s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+  0%   { box-shadow: 0 0 0 0 currentColor; }
+  70%  { box-shadow: 0 0 0 18px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.animate-orbPulse {
+  animation: orbPulse 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 /* Per-city palette overrides — applied via data-city on a wrapper div.
    See iterations.md "Local-page pixel-art generation as SEO moat" for
    the architecture context. */
