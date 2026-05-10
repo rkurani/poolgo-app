@@ -217,6 +217,24 @@ Conflating these two produces a polished cartoon (which the first regen drifted 
 
 Concept exploring. First macro AI image rendered in Pencil (frame `m3DaR` in `poolgo.pen`); regenerating with the lofi-girl direction. Photo-to-world onboarding still vapor — needs an image-understanding spike to validate feasibility (probably Claude Vision or Gemini for the detection pass; the world-build is the same image-gen pipeline). Animation layer is straight CSS / Lottie / Rive once the still frame lands.
 
+### Real-logo pattern (resolved 2026-05-10)
+
+**Question:** real OEM logos and partner brand marks (Pentair, Hayward, Leslie's, a pro's business logo) need to appear somewhere — they're real assets brand owners control and care about. How do they coexist with a pixel-art world?
+
+**Answer:** *Real logos appear as themselves, but always inside a chunky pixel-chrome frame.* The frame is the connective tissue.
+
+Three concrete patterns now in production on `demo/canvas`:
+
+1. **`<RealLogoChip>`** (`/equipment/intelliflo3`) — small horizontal card with: a 4px brand-color stripe at top, a real PNG/SVG logo on the left, and "Authentic OEM" / "Parts in stock locally" tagline on the right. Used in a "Trust strip" alongside warranty/cert chips.
+2. **`<LogoFrame>`** (`/care`) — square pixel-bordered tile that wraps a real logo or a person's pixel portrait. Used in test-result cards (Leslie's logo on a free-water-test entry, Carlos's pixel portrait on a weekly-visit entry).
+3. **`<PhotoFrame>`** (`/care` observations) — full-bleed user-uploaded photo inside a chunky `border-[3px]` frame with caption beneath. The pixel chrome holds. Real logos within those photos (a brand on a salt bag, a Pentair sticker on the unit) appear naturally.
+
+**Brand TEXT vs brand LOGO MARK:**
+- Pixel layer / chrome → uppercase brand text in Press Start 2P (`PENTAIR · Variable Speed`). Always present.
+- Leaf / detail / trust strips / user photos → real logo marks. The frame absorbs them into the world.
+
+This means a homeowner uploading their pro's actual business logo at signup gets a logo card that visually plays with the rest of the world, no design retraining needed.
+
 ---
 
 ## Iteration 4 — Visual system pivot (Sims/Pokemon spectrum, anti-AI moat)

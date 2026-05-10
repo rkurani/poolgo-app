@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Activity, Wrench, Calendar, FileText, Zap } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, ArrowRight, Activity, Wrench, Calendar, FileText, Zap, ShieldCheck, BadgeCheck } from "lucide-react";
 
 const STATS = [
   { label: "RPM", value: "1,750", caption: "Stage B" },
@@ -98,6 +99,20 @@ export default function IntelliFlo3Page() {
                 3D coming soon
               </span>
             </div>
+          </div>
+        </section>
+
+{/* Real-logo trust strip: real OEM logo + warranty + certifications, framed in pixel chrome */}
+        <section className="flex flex-col gap-3">
+          <span className="font-pixel text-[10px] uppercase tracking-[0.2em]"
+                style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
+            Certified, branded, on warranty
+          </span>
+          <div className="flex flex-wrap gap-3 sm:gap-4 items-stretch">
+            <RealLogoChip src="/assets/pentair.jpg" alt="Pentair" tone="var(--brand-accent)" tagline="Authentic OEM" />
+            <WordChip Icon={ShieldCheck} title="4-yr warranty" body="Active until Sep 2026" tone="var(--color-source-live)" />
+            <WordChip Icon={BadgeCheck} title="Carlos certified" body="Authorized service" tone="var(--color-source-human)" />
+            <RealLogoChip src="/assets/leslies.png" alt="Leslie's" tone="var(--color-leslies, #0046A8)" tagline="Parts in stock locally" />
           </div>
         </section>
 
@@ -289,6 +304,73 @@ export default function IntelliFlo3Page() {
             ))}
           </div>
         </section>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * RealLogoChip: a real brand logo (Pentair, Leslie's) sits inside a chunky
+ * pixel-chrome card. The frame is what anchors the real mark in the world.
+ */
+function RealLogoChip({ src, alt, tone, tagline }: { src: string; alt: string; tone: string; tagline: string }) {
+  return (
+    <div
+      className="relative rounded-xl border-2 px-4 py-3 flex items-center gap-3 shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
+      style={{
+        backgroundColor: "var(--color-data-cream-2, #E5D7BE)",
+        borderColor: "var(--color-mountain-shadow, #5C5546)",
+      }}
+    >
+      <span
+        className="absolute top-0 left-0 right-0 h-[4px]"
+        style={{ backgroundColor: tone }}
+        aria-hidden
+      />
+      <div className="relative h-9 w-12 shrink-0 mt-1">
+        <Image src={src} alt={alt} fill sizes="48px" className="object-contain" />
+      </div>
+      <div className="flex flex-col gap-0">
+        <span className="text-[13px] font-extrabold tracking-[-0.005em]"
+              style={{ color: "var(--color-data-ink, #3B342A)" }}>
+          {alt}
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em]"
+              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
+          {tagline}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function WordChip({ Icon, title, body, tone }: { Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>; title: string; body: string; tone: string }) {
+  return (
+    <div
+      className="relative rounded-xl border-2 px-4 py-3 flex items-center gap-3 shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
+      style={{
+        backgroundColor: "var(--color-data-cream-2, #E5D7BE)",
+        borderColor: "var(--color-mountain-shadow, #5C5546)",
+      }}
+    >
+      <span
+        className="absolute top-0 left-0 right-0 h-[4px]"
+        style={{ backgroundColor: tone }}
+        aria-hidden
+      />
+      <div className="grid place-items-center h-9 w-9 rounded-lg shrink-0"
+           style={{ backgroundColor: tone, color: "white" }}>
+        <Icon size={18} strokeWidth={2.4} />
+      </div>
+      <div className="flex flex-col gap-0">
+        <span className="text-[13px] font-extrabold tracking-[-0.005em]"
+              style={{ color: "var(--color-data-ink, #3B342A)" }}>
+          {title}
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.08em]"
+              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
+          {body}
+        </span>
       </div>
     </div>
   );
