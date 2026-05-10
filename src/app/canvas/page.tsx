@@ -14,53 +14,56 @@ type Hotspot = {
   tone: Tone;
 };
 
+const STAGE_W = 2400;
+const STAGE_H = 1500;
+
 const HOTSPOTS: Hotspot[] = [
   {
     id: "pool",
-    x: 36,
-    y: 48,
-    w: 26,
-    h: 28,
+    x: 38,
+    y: 50,
+    w: 22,
+    h: 26,
     label: "Today's water · pH 7.4",
     href: "/care",
     tone: "ai",
   },
   {
     id: "pad",
-    x: 68,
-    y: 64,
-    w: 28,
-    h: 32,
+    x: 66,
+    y: 62,
+    w: 22,
+    h: 28,
     label: "The pad · 5 units live",
     href: "/equipment",
     tone: "live",
   },
   {
     id: "lounger",
-    x: 5,
-    y: 34,
-    w: 18,
-    h: 22,
+    x: 7,
+    y: 36,
+    w: 16,
+    h: 20,
     label: "Maya is here · tap to ping",
     href: "/care",
     tone: "human",
   },
   {
     id: "truck",
-    x: 52,
-    y: 2,
-    w: 22,
-    h: 20,
+    x: 50,
+    y: 8,
+    w: 20,
+    h: 16,
     label: "Carlos · 4 mins up the street",
-    href: "/folks",
+    href: "/folks/carlos-redlands",
     tone: "human",
   },
   {
     id: "shop",
-    x: 84,
-    y: 0,
+    x: 80,
+    y: 4,
     w: 16,
-    h: 30,
+    h: 22,
     label: "Leslie's · 2 mi · in stock",
     href: "/folks",
     tone: "imported",
@@ -76,12 +79,19 @@ const TONE_COLOR: Record<Tone, string> = {
 
 export default function CanvasPage() {
   return (
-    <div className="relative w-full bg-ink overflow-x-auto overflow-y-hidden h-[calc(100dvh-96px)] md:h-[calc(100dvh-72px)]">
-      <div className="relative h-full w-[1400px] md:w-full md:max-w-[1920px] mx-auto">
+    <div
+      data-city="redlands"
+      className="relative w-full overflow-auto h-[calc(100dvh-96px)] md:h-[calc(100dvh-72px)]"
+      style={{ backgroundColor: "var(--color-canvas-ground, #D4B896)" }}
+    >
+      <div
+        className="relative shrink-0"
+        style={{ width: STAGE_W, height: STAGE_H }}
+      >
         <div
           className="absolute inset-0 z-10 bg-no-repeat bg-cover bg-center"
           style={{
-            backgroundImage: "url(/assets/canvas/backyard-macro.png)",
+            backgroundImage: "url(/assets/canvas/redlands-macro.png)",
             imageRendering: "pixelated",
           }}
           aria-hidden
@@ -92,9 +102,17 @@ export default function CanvasPage() {
         ))}
       </div>
 
-      <div className="md:hidden pointer-events-none fixed top-4 right-4 z-30">
-        <span className="rounded-full bg-ink/85 backdrop-blur-sm text-white text-[10px] uppercase tracking-[0.12em] font-bold px-3 py-1.5">
-          Scroll the world →
+      <div className="pointer-events-none fixed top-4 right-4 z-30 flex flex-col items-end gap-2">
+        <span
+          className="rounded-full backdrop-blur-sm text-white text-[10px] uppercase tracking-[0.12em] font-bold px-3 py-1.5"
+          style={{ backgroundColor: "var(--color-mountain-shadow, #5C5546)" }}
+        >
+          Redlands · explore
+        </span>
+        <span className="md:hidden rounded-full bg-white/85 backdrop-blur-sm text-[10px] uppercase tracking-[0.12em] font-bold px-3 py-1.5"
+          style={{ color: "var(--color-mountain-shadow, #5C5546)" }}
+        >
+          ↕ scroll the world
         </span>
       </div>
     </div>
@@ -125,7 +143,10 @@ function HotspotChip({ spot }: { spot: Hotspot }) {
         aria-hidden
       />
 
-      <span className="relative z-10 inline-flex items-center gap-2 rounded-full bg-ink/90 backdrop-blur-sm border border-white/15 px-3 py-1.5 text-white text-[12px] font-semibold leading-none translate-y-1 group-hover:translate-y-0 transition-transform shadow-[0_4px_12px_rgba(0,0,0,0.45)]">
+      <span
+        className="relative z-10 inline-flex items-center gap-2 rounded-full backdrop-blur-sm border border-white/20 px-3 py-1.5 text-white text-[12px] font-semibold leading-none translate-y-1 group-hover:translate-y-0 transition-transform shadow-[0_4px_12px_rgba(0,0,0,0.35)]"
+        style={{ backgroundColor: "var(--color-mountain-shadow, #5C5546)" }}
+      >
         <span
           className="h-2 w-2 rounded-full shrink-0"
           style={{ backgroundColor: color }}
