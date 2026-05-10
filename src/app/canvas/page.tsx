@@ -79,18 +79,6 @@ export default function CanvasPage() {
     <div className="relative w-full bg-ink overflow-x-auto overflow-y-hidden h-[calc(100dvh-96px)] md:h-[calc(100dvh-72px)]">
       <div className="relative h-full w-[1400px] md:w-full md:max-w-[1920px] mx-auto">
         <div
-          className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center"
-          aria-hidden
-        >
-          <span className="text-white/35 text-sm tracking-wide text-center px-6">
-            Drop the backyard image at{" "}
-            <code className="font-mono text-white/60 bg-white/5 px-2 py-0.5 rounded">
-              public/assets/canvas/backyard-macro.png
-            </code>
-          </span>
-        </div>
-
-        <div
           className="absolute inset-0 z-10 bg-no-repeat bg-cover bg-center"
           style={{
             backgroundImage: "url(/assets/canvas/backyard-macro.png)",

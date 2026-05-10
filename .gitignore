@@ -42,3 +42,4 @@ next-env.d.ts
 
 # pencil.dev scratchpad (local design state, not source-controlled)
 *.pen
+images/
