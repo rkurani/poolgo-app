@@ -143,7 +143,18 @@ The `demo/iter-6` branch has My Pool, Care, Equipment, Connect, and Folks built 
 
 ### The seed
 
-`flipbook.page` (demo'd in `youtube.com/watch?v=wVWdKkq6SVo`) as a navigation reference. FlipBook is an "infinite visual browser" — a continuous zoomable canvas. PoolGo's data is organized around a *place* (your pool, your pad, the pump on the pad). Tabs are an abstraction inherited from the web; spatial zoom is closer to the homeowner's actual mental model.
+`flipbook.page` (demo'd in `youtube.com/watch?v=wVWdKkq6SVo`; local copy at `inspo/ParisExampleVideo.mp4`) as the navigation reference. FlipBook is an "infinite visual browser" — a continuous zoomable canvas where the environment *is* the navigation.
+
+**The Paris demo as analogy.** The video opens on an illustrated Paris. The Eiffel Tower, the Louvre, the river are not menu items — they're objects in a world, and clicking any of them goes deeper rather than switching a tab. The video frames the contrast explicitly: a MacBook shown as a "static webapp" against the alternative of "an infinite internet of pixels in latent space." Discrete pages → continuous world.
+
+**Direct mapping to PoolGo.** Your house and pool *are* a place. Tabs are an abstraction inherited from the web. The Paris equivalent for a homeowner:
+
+- **Click the water** → today's chemistry (pH, ORP, the verdict)
+- **Click a lounger** with someone in it → that person or the notification attached to them
+- **Click the pad / pump** → equipment status & detail
+- **Click out beyond the property line** → the Folks layer (truck up the street, Leslie's two miles away)
+
+You're not "going to the Chemistry tab." You're looking at the pool and noticing something looks off, then going there.
 
 ### Proposal — canvas as the My Pool surface, not the whole app
 
@@ -173,7 +184,7 @@ All of it. Every detail page, every list, every tab. Components we've already bu
 ### Risks we're explicitly testing
 
 - **Performance.** A real pinch-zoom canvas with crossfading sprites is heavy. FlipBook is built around it; we'd be retrofitting on Next.js + Tailwind. Mobile especially. May need a `<canvas>` or WebGL layer for the zoom physics, with React rendering the leaf detail surfaces normally.
-- **Discoverability.** Tabs are obvious. A canvas needs a 1-shot tutorial or an obvious affordance ("click your pump"). First-run experience matters disproportionately.
+- **Discoverability *and speed*.** Tabs are obvious. A canvas needs a 1-shot tutorial or an obvious affordance ("click your pump"). First-run experience matters disproportionately. Equally important: the canvas can be the delight layer + entry point, but if a user just wants to check pH before adding chemicals, that's still 1–2 taps. Power-nav (TopNav, keyboard shortcuts on desktop, a swipe-gesture shortcut on mobile) has to coexist with the canvas — it can't replace utility with browsing.
 - **Dual-architecture cost.** Maintaining a canvas-driven `/` *and* conventional `/equipment`, `/care` routes doubles the surface area. The leaf detail pages must be the *same components* whether reached via tab click or via canvas zoom — otherwise we're shipping two products.
 - **Multi-pool households.** Canvas is "a place." When a homeowner has a pool *and* a spa *and* a pond, does the canvas widen? Pan? Switch via a top-level toggle?
 
