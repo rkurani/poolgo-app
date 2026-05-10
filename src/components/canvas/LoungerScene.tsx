@@ -90,18 +90,20 @@ export function LoungerScene({ x, y }: { x: number; y: number }) {
 
   return (
     <div
-      className="absolute z-[18] pointer-events-none"
+      className="absolute z-[40] pointer-events-none"
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        transform: "translate(-50%, -50%)",
+        transform: "translate(-50%, -50%) scale(2)",
+        transformOrigin: "center",
       }}
     >
       {/* Empty lounger always present so the bg figure stays covered when Maya wanders */}
       <div className="relative">
         <EmptyLoungerSVG />
 
-        {/* Maya — translates by state, swaps sprite */}
+        {/* Maya — translates by state, swaps sprite. Whole wrapper is clickable
+            so users have a generous target on top of the small pixel sprite. */}
         <button
           type="button"
           onClick={onClick}
@@ -109,13 +111,16 @@ export function LoungerScene({ x, y }: { x: number; y: number }) {
             isOnLounger ? "Maya on the lounger, click to wave"
             : "Maya, currently up. Click to greet."
           }
-          className="absolute pointer-events-auto"
+          className="absolute pointer-events-auto cursor-pointer"
           style={{
-            // anchor her to the seat of the lounger
-            left: 18,
-            top: -4,
+            // anchor her to the seat of the lounger, padded for a bigger hit area
+            left: 12,
+            top: -10,
+            padding: 6,
             transform: `translateX(${offset * 8}px) scaleX(${state === "walking-back" ? -1 : 1})`,
             transition: "transform 4.5s cubic-bezier(0.6, 0.05, 0.4, 0.95)",
+            background: "transparent",
+            border: "none",
           }}
         >
           {isOnLounger ? <MayaSittingSVG /> : <MayaWalkingSVG bobbing={isMoving} fetching={isFetching} />}

@@ -19,7 +19,7 @@ const STAGE_H = 1500;
 const HOTSPOTS: Hotspot[] = [
   { id: "pool",    x: 48, y: 60, label: "Today's water",                detail: "pH 7.4, ORP 720", href: "/care",                  status: "good" },
   { id: "pad",     x: 78, y: 76, label: "The pad",                     detail: "5 systems, all live", href: "/equipment",         status: "good" },
-  { id: "lounger", x: 14, y: 64, label: "Maya is here",                detail: "On the lounger, 2:14pm", href: "/care",            status: "human" },
+  { id: "lounger", x: 9,  y: 53, label: "Maya is here",                detail: "On the lounger, 2:14pm. Tap her to wave.", href: "/care", status: "human" },
   { id: "truck",   x: 62, y: 11, label: "Carlos, 4 mins up the street",detail: "Routes nearby",       href: "/folks/carlos-redlands", status: "human" },
   { id: "shop",    x: 92, y: 14, label: "Leslie's, 2 mi",              detail: "In stock now",       href: "/folks",                 status: "info" },
 ];
