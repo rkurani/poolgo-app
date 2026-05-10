@@ -52,6 +52,15 @@ button { font-family: inherit; cursor: pointer; }
   animation: canvasPulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+@keyframes pixelFloat {
+  0%   { transform: translateY(0px); opacity: 0.35; }
+  50%  { transform: translateY(-6px); opacity: 0.45; }
+  100% { transform: translateY(0px); opacity: 0.35; }
+}
+.animate-pixelFloat {
+  animation: pixelFloat 6s ease-in-out infinite;
+}
+
 /* Per-city palette overrides — applied via data-city on a wrapper div.
    See iterations.md "Local-page pixel-art generation as SEO moat" for
    the architecture context. */
@@ -66,6 +75,13 @@ button { font-family: inherit; cursor: pointer; }
   --color-data-ink: #3B342A;
   --color-data-ink-mute: #6E6555;
   --color-terracotta: #C75240;
+}
+
+/* Pixel display font (Press Start 2P) for watermarks, callouts, stat numerals,
+   section accents — pulled in via next/font in layout.tsx. */
+.font-pixel {
+  font-family: var(--font-press-start), "Press Start 2P", monospace;
+  letter-spacing: 0.04em;
 }
 
 /* Pixel-stepped accent bar — used as section dividers and below stats.

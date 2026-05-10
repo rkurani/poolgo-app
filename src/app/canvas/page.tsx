@@ -97,6 +97,24 @@ export default function CanvasPage() {
           aria-hidden
         />
 
+        <div
+          className="absolute z-15 pointer-events-none select-none animate-pixelFloat"
+          style={{ top: 56, left: 80 }}
+          aria-hidden
+        >
+          <div className="font-pixel text-[44px] sm:text-[64px] leading-none uppercase"
+               style={{
+                 color: "var(--color-mountain-shadow, #5C5546)",
+                 textShadow: "4px 4px 0 rgba(255, 240, 200, 0.4)",
+               }}>
+            Redlands
+          </div>
+          <div className="font-pixel text-[10px] sm:text-[12px] mt-3 tracking-[0.3em]"
+               style={{ color: "var(--color-mountain-shadow, #5C5546)", opacity: 0.7 }}>
+            CA · 92373 · MAY
+          </div>
+        </div>
+
         {HOTSPOTS.map((spot) => (
           <HotspotChip key={spot.id} spot={spot} />
         ))}
