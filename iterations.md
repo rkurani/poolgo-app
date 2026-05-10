@@ -131,6 +131,66 @@ The seven things all four references share that contradict the current `DESIGN.m
 
 ---
 
+## Iteration 3 — Spatial Canvas (interaction architecture)
+
+**Different kind of iteration.** Iter 0–2 explored *visual* direction. This one explores *navigation*. The visual system (Pure → warm-cream lean from Iter 2) is orthogonal — whichever surface treatment lands, the canvas direction can sit on top of it.
+
+### Iter-6 is the frozen baseline
+
+The `demo/iter-6` branch has My Pool, Care, Equipment, Connect, and Folks built out as conventional tab-based surfaces (TopNav + 6 routes). **That's the baseline this iteration explores in parallel against, not on top of.** When we prototype the canvas, it lives on a fresh branch off `demo/iter-6` so the existing build is preserved.
+
+> Note for Ravi: working tree on `demo/iter-6` was dirty when we entered this iteration. If you want a true git-level freeze (tag), commit the WIP to the branch first — I haven't touched it.
+
+### The seed
+
+`flipbook.page` (demo'd in `youtube.com/watch?v=wVWdKkq6SVo`) as a navigation reference. FlipBook is an "infinite visual browser" — a continuous zoomable canvas. PoolGo's data is organized around a *place* (your pool, your pad, the pump on the pad). Tabs are an abstraction inherited from the web; spatial zoom is closer to the homeowner's actual mental model.
+
+### Proposal — canvas as the My Pool surface, not the whole app
+
+1. `/` (My Pool) becomes a top-down isometric of the pool + pad. Pixelated/iconographic at the macro zoom.
+2. As you zoom into the equipment pad, the pixel art crossfades to a high-res photo of the unit (IntelliFlo3, IntellipH, etc.) and the chrome saturates with that OEM's brand color. **The zoom IS the OEM cascade** — proximity to the product is proximity to the brand identity.
+3. Crossing a zoom threshold commits to the existing equipment detail page. Pinch-out / back returns to the canvas at the prior zoom.
+4. Care doesn't appear as a tab from the canvas — it's spatial too. "A guy in a truck up the street" appears as a pin on the outer ring; tapping him routes into the Folks/tech profile we've already built. "Leslie's two miles away" same pattern. **The canvas is an interface *into* the existing tabs, not a replacement for them.**
+5. TopNav stays. Anyone who prefers list/dashboard navigation never touches the canvas. The canvas is the *signature* surface, not the only one.
+
+### Information density on the canvas (Ravi's call)
+
+- Source-color pins on equipment, same legend as everywhere else: Live, Imported, Human, AI.
+- **Orbiting / pulsing indicator** when something needs attention (pH low → pH-meter pin pulses red-soft and orbits the pool node). One signal per problem, not a sea of warnings.
+- Recent-activity dots fade over 24–48h.
+
+### Interaction model
+
+- **Desktop:** click-to-zoom (camera dollies to the clicked node, never instant). Trackpad pinch-zoom supported as a power-user gesture.
+- **Mobile:** pinch-zoom primary. Tap on a leaf node accelerates the zoom-to-detail transition.
+- **Threshold-based commit:** at zoom level X, the canvas commits to the equipment detail page. Below X, you can fly back out smoothly.
+- **Back gesture** (swipe-down or escape) always returns to the canvas at the prior zoom.
+
+### What stays from iter-6
+
+All of it. Every detail page, every list, every tab. Components we've already built (`PumpHero`, `EquipmentTile`, `ChemistryStrip`, `ActivityFeed`, `ProCard`, `FeaturedPro`, etc.) are the leaf views the canvas zooms into. The canvas should never re-implement a leaf — it should route to it.
+
+### Risks we're explicitly testing
+
+- **Performance.** A real pinch-zoom canvas with crossfading sprites is heavy. FlipBook is built around it; we'd be retrofitting on Next.js + Tailwind. Mobile especially. May need a `<canvas>` or WebGL layer for the zoom physics, with React rendering the leaf detail surfaces normally.
+- **Discoverability.** Tabs are obvious. A canvas needs a 1-shot tutorial or an obvious affordance ("click your pump"). First-run experience matters disproportionately.
+- **Dual-architecture cost.** Maintaining a canvas-driven `/` *and* conventional `/equipment`, `/care` routes doubles the surface area. The leaf detail pages must be the *same components* whether reached via tab click or via canvas zoom — otherwise we're shipping two products.
+- **Multi-pool households.** Canvas is "a place." When a homeowner has a pool *and* a spa *and* a pond, does the canvas widen? Pan? Switch via a top-level toggle?
+
+### Open questions — must resolve before prototyping
+
+1. **What zoom levels are stops?** Pool-overview → pad-overview → single-unit detail is 3 stops. Is there a 4th (sub-component, e.g. impeller / o-ring) or does the leaf detail page handle that?
+2. **Continuous zoom vs. staged transitions?** True continuous (magical, heavy) vs. 3-state crossfade that *feels* zoomy (cheap, ships faster). The cheap version is probably the right MVP — saves the WebGL-grade engineering for after we've validated the concept.
+3. **What's at the outer ring?** Care/Folks pins (truck up the street, Leslie's down the road) vs. ambient (weather, season) vs. nothing (canvas ends at the property line). Ravi's instinct points at the truck/Leslie's direction.
+4. **Macro-zoom visual treatment.** Pixelated icons (Ravi's instinct — playful, distinctive) vs. flat illustration vs. real top-down satellite of the property. Pixelated needs a commissioned icon set; satellite needs Mapbox + per-property art direction.
+5. **Visual system parity.** The canvas's background, line treatment, and pin colors must play with the Pure / warm-cream language Iter 2 is heading toward. They aren't independent decisions.
+
+### Status
+
+Concept only. No code on the canvas direction yet. Next move: pick (a) outer-ring content, (b) macro-zoom visual treatment, then (c) sketch in Pencil before any TSX.
+
+---
+
 ## How this file evolves
 
 - Each iteration appends a new section ("Iteration 3 — …", "Iteration 4 — …")
