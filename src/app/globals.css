@@ -86,22 +86,6 @@ button { font-family: inherit; cursor: pointer; }
   animation: flyRightToLeft 34s linear infinite;
 }
 
-@keyframes walkRightToLeft {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-130vw); }
-}
-.animate-walkRL {
-  animation: walkRightToLeft 48s linear infinite;
-}
-
-@keyframes walkLeftToRight {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(130vw); }
-}
-.animate-walkLR {
-  animation: walkLeftToRight 62s linear infinite;
-}
-
 @keyframes floatBob {
   0%   { transform: translateY(0) rotate(0deg); }
   25%  { transform: translateY(-2px) rotate(1.5deg); }

@@ -18,7 +18,7 @@ const STAGE_H = 1500;
 const HOTSPOTS: Hotspot[] = [
   { id: "pool",    x: 48, y: 60, label: "Today's water",                detail: "pH 7.4, ORP 720", href: "/care",                  status: "good" },
   { id: "pad",     x: 78, y: 76, label: "The pad",                     detail: "5 systems, all live", href: "/equipment",         status: "good" },
-  { id: "lounger", x: 14, y: 46, label: "Maya is here",                detail: "On the lounger, 2:14pm", href: "/care",            status: "human" },
+  { id: "lounger", x: 14, y: 64, label: "Maya is here",                detail: "On the lounger, 2:14pm", href: "/care",            status: "human" },
   { id: "truck",   x: 62, y: 11, label: "Carlos, 4 mins up the street",detail: "Routes nearby",       href: "/folks/carlos-redlands", status: "human" },
   { id: "shop",    x: 92, y: 14, label: "Leslie's, 2 mi",              detail: "In stock now",       href: "/folks",                 status: "info" },
 ];
@@ -184,14 +184,6 @@ function AmbientLayer() {
         <BirdSprite small />
       </div>
 
-      {/* Walkers, on the street */}
-      <div className="absolute animate-walkRL" style={{ top: "9%", left: "104%" }}>
-        <WalkerSprite />
-      </div>
-      <div className="absolute animate-walkLR" style={{ top: "14%", left: "-6%", animationDelay: "12s" }}>
-        <FamilyStrollerSprite />
-      </div>
-
       {/* Pool surface — duck bobbing on the water */}
       <div
         className="absolute animate-floatBob"
@@ -212,10 +204,6 @@ function AmbientLayer() {
 }
 
 const INK = "#3B342A";
-const SHIRT = "#C75240";
-const PANTS = "#1A4F8B";
-const SKIN = "#E8B989";
-const STROLLER = "#2C5F4A";
 const DUCK_BODY = "#E8A82C";
 const DUCK_BEAK = "#C75240";
 
@@ -241,88 +229,6 @@ function BirdSprite({ small = false }: { small?: boolean }) {
       <rect x="16" y="8" width="2" height="1" fill={DUCK_BEAK} />
       {/* eye dot */}
       <rect x="14" y="8" width="1" height="1" fill="#F1E6D3" />
-    </svg>
-  );
-}
-
-function WalkerSprite() {
-  return (
-    <svg
-      width="14"
-      height="26"
-      viewBox="0 0 14 26"
-      shapeRendering="crispEdges"
-      aria-hidden
-    >
-      {/* hat */}
-      <rect x="3" y="0" width="8" height="2" fill={INK} />
-      <rect x="2" y="2" width="10" height="1" fill={INK} />
-      {/* head */}
-      <rect x="4" y="3" width="6" height="5" fill={SKIN} />
-      <rect x="5" y="5" width="1" height="1" fill={INK} />
-      <rect x="8" y="5" width="1" height="1" fill={INK} />
-      {/* torso */}
-      <rect x="3" y="8" width="8" height="8" fill={SHIRT} />
-      <rect x="3" y="11" width="8" height="1" fill="#A03A2A" />
-      {/* arms */}
-      <rect x="1" y="8" width="2" height="6" fill={SHIRT} />
-      <rect x="11" y="9" width="2" height="6" fill={SHIRT} />
-      {/* legs */}
-      <rect x="3" y="16" width="3" height="7" fill={PANTS} />
-      <rect x="8" y="16" width="3" height="7" fill={PANTS} />
-      {/* feet */}
-      <rect x="2" y="23" width="4" height="2" fill={INK} />
-      <rect x="8" y="23" width="4" height="2" fill={INK} />
-    </svg>
-  );
-}
-
-function FamilyStrollerSprite() {
-  return (
-    <svg
-      width="44"
-      height="28"
-      viewBox="0 0 44 28"
-      shapeRendering="crispEdges"
-      aria-hidden
-    >
-      {/* adult 1 */}
-      <rect x="3" y="2" width="6" height="5" fill={SKIN} />
-      <rect x="4" y="4" width="1" height="1" fill={INK} />
-      <rect x="7" y="4" width="1" height="1" fill={INK} />
-      <rect x="2" y="7" width="8" height="8" fill={STROLLER} />
-      <rect x="2" y="15" width="3" height="7" fill={INK} />
-      <rect x="7" y="15" width="3" height="7" fill={INK} />
-      <rect x="1" y="22" width="4" height="2" fill={INK} />
-      <rect x="6" y="22" width="4" height="2" fill={INK} />
-
-      {/* adult 2 */}
-      <rect x="13" y="2" width="6" height="5" fill={SKIN} />
-      <rect x="14" y="4" width="1" height="1" fill={INK} />
-      <rect x="17" y="4" width="1" height="1" fill={INK} />
-      <rect x="12" y="7" width="8" height="8" fill={SHIRT} />
-      <rect x="12" y="15" width="3" height="7" fill={PANTS} />
-      <rect x="17" y="15" width="3" height="7" fill={PANTS} />
-      <rect x="11" y="22" width="4" height="2" fill={INK} />
-      <rect x="16" y="22" width="4" height="2" fill={INK} />
-
-      {/* stroller canopy */}
-      <rect x="23" y="8" width="10" height="2" fill={DUCK_BODY} />
-      <rect x="22" y="10" width="12" height="6" fill={DUCK_BODY} />
-      <rect x="23" y="11" width="2" height="4" fill={SKIN} />
-      <rect x="24" y="13" width="1" height="1" fill={INK} />
-      {/* handle */}
-      <rect x="33" y="9" width="3" height="2" fill={INK} />
-      <rect x="32" y="11" width="2" height="5" fill={INK} />
-      {/* frame */}
-      <rect x="22" y="16" width="14" height="1" fill={INK} />
-      <rect x="22" y="17" width="2" height="5" fill={INK} />
-      <rect x="34" y="17" width="2" height="5" fill={INK} />
-      {/* wheels */}
-      <rect x="20" y="22" width="6" height="4" fill={INK} />
-      <rect x="32" y="22" width="6" height="4" fill={INK} />
-      <rect x="22" y="23" width="2" height="2" fill="#6E6555" />
-      <rect x="34" y="23" width="2" height="2" fill="#6E6555" />
     </svg>
   );
 }
