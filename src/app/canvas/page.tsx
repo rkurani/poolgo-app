@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LoungerScene } from "@/components/canvas/LoungerScene";
 
 type Status = "good" | "warn" | "info" | "human";
 
@@ -57,6 +58,11 @@ export default function CanvasPage() {
             over the macro image. Each is its own pixel-art SVG sprite with
             its own keyframe animation. Subtle, lofi-girl style. */}
         <AmbientLayer />
+
+        {/* The signature interactive moment: Maya on her lounger. She idles,
+            then on a random interval gets up, walks across the deck to fetch
+            a drink, lingers, and walks back. Click her to wave hello. */}
+        <LoungerScene x={14} y={64} />
 
         <div
           className="absolute z-20 pointer-events-none select-none animate-pixelFloat"
