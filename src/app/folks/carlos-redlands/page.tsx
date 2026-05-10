@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Calendar, Wrench, Droplet, Zap, MapPin, Star } from "lucide-react";
+import { SectionHeader } from "@/components/SectionHeader";
 
 const SERVICES = [
   {
@@ -192,7 +193,7 @@ export default function CarlosRedlandsPage() {
         </section>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader title="What Carlos does." caption="four services · all priced before the visit" />
+          <SectionHeader title="What Carlos does." caption="all priced before the visit" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {SERVICES.map((svc) => (
               <div
@@ -243,7 +244,7 @@ export default function CarlosRedlandsPage() {
         </section>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Where Carlos goes." caption="routes within 18 minutes of your pool" />
+          <SectionHeader title="Where Carlos goes." caption="within 18 minutes of your pool" />
           <div
             className="rounded-xl border-2 p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-y-2 sm:gap-y-3 gap-x-8"
             style={{
@@ -270,7 +271,7 @@ export default function CarlosRedlandsPage() {
         </section>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Certified on." caption="OEM brands on your pad — Carlos can warranty service all of them" />
+          <SectionHeader title="Certified on." caption="warranty service for the brands on your pad" />
           <div className="flex flex-wrap gap-2">
             {PARTNERSHIPS.map((p) => (
               <span
@@ -289,7 +290,7 @@ export default function CarlosRedlandsPage() {
         </section>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader title="What Carlos has been up to." caption="last three visits · neighbors anonymized" />
+          <SectionHeader title="What Carlos has been up to." caption="neighbors anonymized" />
           <div className="flex flex-col">
             {ACTIVITY.map((entry, i) => (
               <div
@@ -334,7 +335,7 @@ export default function CarlosRedlandsPage() {
         </section>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader title="What people are saying." caption="recent reviews from your block" />
+          <SectionHeader title="What people are saying." caption="recent reviews, from your block" />
           <div
             className="rounded-xl border-2 p-6 flex flex-col gap-4"
             style={{
@@ -370,7 +371,7 @@ export default function CarlosRedlandsPage() {
               className="text-[12px] font-semibold uppercase tracking-[0.08em]"
               style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
             >
-              — David & Lin K. · Cypress Ave · 4 days ago
+              David & Lin K. · Cypress Ave · 4 days ago
             </span>
           </div>
         </section>
@@ -406,22 +407,3 @@ export default function CarlosRedlandsPage() {
   );
 }
 
-function SectionHeader({ title, caption }: { title: string; caption: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <h2
-        className="text-[26px] sm:text-[30px] leading-tight font-extrabold tracking-[-0.02em]"
-        style={{ color: "var(--color-data-ink, #3B342A)" }}
-      >
-        {title}
-      </h2>
-      <span
-        className="text-[12px] font-semibold uppercase tracking-[0.1em]"
-        style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
-      >
-        {caption}
-      </span>
-      <div className="pixel-bar-thin mt-2" aria-hidden />
-    </div>
-  );
-}

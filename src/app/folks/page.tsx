@@ -1,13 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, MapPin, Star, Clock, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, Star, Clock, Upload, Truck } from "lucide-react";
+import { SectionHeader } from "@/components/SectionHeader";
 
-type Pro = {
+// A "Pro" can be a solo independent (just a person) or a business (named
+// company with a lead operator). The card shape adjusts based on `kind`.
+type SoloPro = {
   id: string;
-  name: string;
+  kind: "solo";
+  person: string;
   role: string;
-  portrait: string | null; // path or null for placeholder
-  portraitTone: string; // fallback color when portrait missing
+  portrait: string | null;
+  portraitTone: string;
   blurb: string;
   miles: string;
   rating: string;
@@ -16,14 +20,36 @@ type Pro = {
   href: string;
 };
 
+type BusinessPro = {
+  id: string;
+  kind: "business";
+  business: string;
+  lead: string;
+  leadRole: string;
+  portrait: string | null;
+  portraitTone: string;
+  logo: string | null;
+  brandTone: string;
+  blurb: string;
+  miles: string;
+  rating: string;
+  reviews: string;
+  status: { tone: string; text: string };
+  fleet?: string;
+  href: string;
+};
+
+type Pro = SoloPro | BusinessPro;
+
 const PROS: Pro[] = [
   {
     id: "carlos",
-    name: "Carlos Mendoza",
-    role: "Pool service · independent",
+    kind: "solo",
+    person: "Carlos Mendoza",
+    role: "Pool service, independent",
     portrait: "/assets/folks/carlos-portrait.png",
     portraitTone: "var(--color-source-human)",
-    blurb: "Twelve years routing the Inland Empire. Tue/Wed/Thu in your block.",
+    blurb: "Twelve years routing the Inland Empire. Tue, Wed, Thu in your block.",
     miles: "0.4 mi",
     rating: "4.9",
     reviews: "142",
@@ -31,29 +57,57 @@ const PROS: Pro[] = [
     href: "/folks/carlos-redlands",
   },
   {
-    id: "maria",
-    name: "Maria Velasquez",
-    role: "Pool builder · gunite & remodel",
+    id: "velasquez-build",
+    kind: "business",
+    business: "Velasquez Build",
+    lead: "Maria Velasquez",
+    leadRole: "Master builder",
     portrait: "/assets/folks/maria-portrait.png",
     portraitTone: "var(--color-citrus)",
-    blurb: "Builds and remodels in San Bernardino County. Specializes in plaster + tile.",
+    logo: null,
+    brandTone: "var(--color-citrus, #E8A82C)",
+    blurb: "Gunite shells, plaster, tile. Twelve-week build calendar, full crew.",
     miles: "1.7 mi",
     rating: "4.8",
     reviews: "63",
     status: { tone: "imported", text: "Booking Q3 · 2 slots open" },
+    fleet: "4 trucks · 12 crew",
     href: "/folks",
   },
   {
-    id: "devon",
-    name: "Devon Park",
-    role: "Pool cleaner · weekly only",
+    id: "redhawk",
+    kind: "business",
+    business: "RedHawk Pool Services",
+    lead: "Devon Park",
+    leadRole: "Route lead",
     portrait: null,
     portraitTone: "#8FB4D8",
-    blurb: "Clean-and-go specialist. No dosing, no equipment work — just a spotless pool.",
+    logo: null,
+    brandTone: "var(--color-terracotta, #C75240)",
+    blurb: "Weekly maintenance route covering Redlands, Yucaipa, and Calimesa. Clean-and-go.",
     miles: "2.3 mi",
     rating: "4.7",
     reviews: "38",
     status: { tone: "live", text: "Mon · Fri routes" },
+    fleet: "3 trucks · 5 cleaners",
+    href: "/folks",
+  },
+  {
+    id: "solcoast",
+    kind: "business",
+    business: "Solcoast Pool Care",
+    lead: "Tony Reyes",
+    leadRole: "Owner & lead tech",
+    portrait: null,
+    portraitTone: "#5C8B6E",
+    logo: null,
+    brandTone: "var(--color-marina, #2C5F4A)",
+    blurb: "Repair and equipment install. Heater rebuilds and salt-cell swaps a specialty.",
+    miles: "4.1 mi",
+    rating: "4.9",
+    reviews: "91",
+    status: { tone: "imported", text: "On-call · 24h response" },
+    fleet: "2 trucks · 6 techs",
     href: "/folks",
   },
 ];
@@ -68,30 +122,33 @@ type Store = {
   badge: string;
   logo: string | null;
   brandTone: string;
+  brandSoft: string;
 };
 
 const STORES: Store[] = [
   {
     id: "leslies",
     name: "Leslie's Pool Supplies",
-    type: "Big-box · chain",
+    type: "Big-box, chain",
     miles: "2.1 mi",
     hours: "Open until 7pm",
     inventory: ["3-inch tabs · 50lb · in stock", "Salt 40lb · 3 bags", "Pentair filter cartridges"],
     badge: "Free water test",
     logo: "/assets/leslies.png",
     brandTone: "var(--color-leslies, #0046A8)",
+    brandSoft: "var(--color-leslies-soft, #DEE8F7)",
   },
   {
     id: "pinch-redlands",
     name: "Pinch A Penny · Redlands",
-    type: "Independent · Spanish-tile front on Orange Ave",
+    type: "Independent, Spanish-tile front on Orange Ave",
     miles: "3.4 mi",
     hours: "Open until 5pm",
     inventory: ["Liquid chlorine · 12 jugs", "Stabilizer · 1 bag", "Hayward filter sand"],
-    badge: "Free water test · weekend booking",
+    badge: "Free water test, weekend booking",
     logo: null,
     brandTone: "var(--color-mountain-shadow, #5C5546)",
+    brandSoft: "var(--color-data-cream-2, #E5D7BE)",
   },
 ];
 
@@ -145,7 +202,7 @@ export default function FolksPage() {
           </h1>
           <p className="text-[15px] sm:text-[17px] font-medium leading-snug max-w-[640px]"
              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-            Forty-seven independent pool people within eight miles — pros routing your block, stores
+            Forty-seven independent pool people within eight miles. Pros routing your block, stores
             you can drop into today, specialists for when something is genuinely broken.
           </p>
           <div className="pixel-bar mt-3" aria-hidden />
@@ -176,11 +233,8 @@ export default function FolksPage() {
         </div>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader
-            title="Pros routing your block."
-            caption="three regulars · independents · all reachable today"
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
+          <SectionHeader title="Pros routing your block." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {PROS.map((pro) => (
               <ProCard key={pro.id} pro={pro} />
             ))}
@@ -188,10 +242,7 @@ export default function FolksPage() {
         </section>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader
-            title="Stores you can drop into."
-            caption="two within three miles · check stock before you drive"
-          />
+          <SectionHeader title="Stores you can drop into." caption="two within three miles" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {STORES.map((store) => (
               <StoreCard key={store.id} store={store} />
@@ -202,7 +253,7 @@ export default function FolksPage() {
         <section className="flex flex-col gap-5">
           <SectionHeader
             title="Specialists for when something breaks."
-            caption="four within twelve miles · only call when something is genuinely off"
+            caption="four within twelve miles"
           />
           <div
             className="rounded-2xl border-2 overflow-hidden"
@@ -262,58 +313,66 @@ function ProCard({ pro }: { pro: Pro }) {
     human: "var(--color-source-human)",
   };
   const statusBg = statusToneMap[pro.status.tone] || "var(--color-source-live)";
+  const stripeTone =
+    pro.kind === "business" ? pro.brandTone : "var(--color-source-human)";
+  const headline = pro.kind === "business" ? pro.business : pro.person;
+  const secondary =
+    pro.kind === "business"
+      ? `${pro.lead} · ${pro.leadRole}${pro.fleet ? ` · ${pro.fleet}` : ""}`
+      : pro.role;
 
   return (
     <Link
       href={pro.href}
-      className="group rounded-2xl border-[3px] p-5 flex flex-col gap-4 hover:translate-y-[-2px] transition-transform shadow-[4px_4px_0_0_rgba(59,52,42,0.15)]"
+      className="group relative rounded-2xl border-[3px] p-5 flex flex-col gap-4 hover:translate-y-[-2px] transition-transform shadow-[4px_4px_0_0_rgba(59,52,42,0.15)] overflow-hidden"
       style={{
         backgroundColor: "var(--color-data-cream, #F1E6D3)",
         borderColor: "var(--color-mountain-shadow, #5C5546)",
       }}
     >
-      <div
-        className="aspect-square rounded-xl border-2 overflow-hidden"
-        style={{
-          borderColor: "var(--color-mountain-shadow, #5C5546)",
-          backgroundImage: pro.portrait ? `url(${pro.portrait})` : "none",
-          backgroundColor: pro.portrait ? "transparent" : pro.portraitTone,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          imageRendering: "pixelated",
-        }}
-        aria-label={`Portrait of ${pro.name}`}
-      >
-        {!pro.portrait && (
-          <div className="h-full w-full grid place-items-center font-pixel text-[36px]"
-               style={{ color: "rgba(255,255,255,0.5)" }}>
-            {pro.name.split(" ").map((s) => s[0]).join("")}
-          </div>
-        )}
-      </div>
+      <span
+        className="absolute top-0 left-0 right-0 h-[6px]"
+        style={{ backgroundColor: stripeTone }}
+        aria-hidden
+      />
 
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-baseline justify-between gap-2">
-          <h3 className="text-[20px] font-extrabold tracking-[-0.01em] leading-tight"
+      <div className="flex items-start gap-4 mt-2">
+        <ProAvatar pro={pro} />
+        <div className="flex flex-col gap-1 flex-1 min-w-0">
+          <div className="flex items-baseline justify-between gap-2">
+            {pro.kind === "business" ? (
+              <span className="font-pixel text-[9px] uppercase tracking-[0.2em]"
+                    style={{ color: pro.brandTone }}>
+                Business
+              </span>
+            ) : (
+              <span className="font-pixel text-[9px] uppercase tracking-[0.2em]"
+                    style={{ color: "var(--color-source-human)" }}>
+                Solo
+              </span>
+            )}
+            <span className="font-pixel text-[10px] tracking-[0.08em] shrink-0"
+                  style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
+              {pro.miles}
+            </span>
+          </div>
+          <h3 className="text-[22px] font-extrabold tracking-[-0.01em] leading-[1.05]"
               style={{ color: "var(--color-data-ink, #3B342A)" }}>
-            {pro.name}
+            {headline}
           </h3>
-          <span className="font-pixel text-[10px] tracking-[0.08em] shrink-0"
+          <span className="text-[12px] font-semibold tracking-[-0.005em]"
                 style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-            {pro.miles}
+            {secondary}
           </span>
         </div>
-        <span className="text-[12px] font-semibold uppercase tracking-[0.05em]"
-              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-          {pro.role}
-        </span>
-        <p className="text-[13px] leading-snug mt-1"
-           style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-          {pro.blurb}
-        </p>
       </div>
 
-      <div className="flex items-center justify-between gap-2 pt-3 border-t-2"
+      <p className="text-[13px] leading-snug"
+         style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
+        {pro.blurb}
+      </p>
+
+      <div className="flex items-center justify-between gap-2 pt-3 border-t-2 mt-auto"
            style={{ borderColor: "var(--color-card-border, #B89B6A)" }}>
         <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em]"
               style={{ backgroundColor: statusBg, color: "white" }}>
@@ -336,6 +395,61 @@ function ProCard({ pro }: { pro: Pro }) {
   );
 }
 
+/**
+ * ProAvatar: portrait of the lead person if available, business-logo plaque
+ * if uploaded, otherwise a Truck-iconed empty state for businesses without a
+ * logo yet (the upload affordance lives on their own admin, not here).
+ */
+function ProAvatar({ pro }: { pro: Pro }) {
+  const portrait = pro.portrait;
+  const portraitTone = pro.portraitTone;
+  const isBusinessNoPortrait = pro.kind === "business" && !portrait;
+
+  if (portrait) {
+    return (
+      <div
+        className="h-[88px] w-[88px] shrink-0 rounded-xl border-2 overflow-hidden bg-no-repeat bg-cover bg-center"
+        style={{
+          borderColor: "var(--color-mountain-shadow, #5C5546)",
+          backgroundImage: `url(${portrait})`,
+          imageRendering: "pixelated",
+        }}
+        aria-label={pro.kind === "business" ? `${pro.lead}` : pro.person}
+      />
+    );
+  }
+
+  if (isBusinessNoPortrait) {
+    return (
+      <div
+        className="h-[88px] w-[88px] shrink-0 rounded-xl border-2 grid place-items-center"
+        style={{
+          borderColor: "var(--color-mountain-shadow, #5C5546)",
+          backgroundColor: pro.brandTone,
+          color: "white",
+        }}
+      >
+        <Truck size={32} strokeWidth={2.4} />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="h-[88px] w-[88px] shrink-0 rounded-xl border-2 grid place-items-center font-pixel text-[24px]"
+      style={{
+        borderColor: "var(--color-mountain-shadow, #5C5546)",
+        backgroundColor: portraitTone,
+        color: "rgba(255,255,255,0.6)",
+      }}
+    >
+      {pro.kind === "solo"
+        ? pro.person.split(" ").map((s) => s[0]).join("")
+        : pro.business.split(" ").map((s) => s[0]).slice(0, 2).join("")}
+    </div>
+  );
+}
+
 function StoreCard({ store }: { store: Store }) {
   return (
     <div
@@ -350,6 +464,7 @@ function StoreCard({ store }: { store: Store }) {
           src={store.logo}
           alt={store.name}
           tone={store.brandTone}
+          softTone={store.brandSoft}
         />
         <div className="flex flex-col gap-0.5 flex-1 min-w-0">
           <div className="flex items-baseline justify-between gap-3">
@@ -419,7 +534,17 @@ function StoreCard({ store }: { store: Store }) {
  * Empty state (logo: null) shows an upload-prompt placeholder so onboarding
  * without a logo has a visual home.
  */
-function StoreLogoFrame({ src, alt, tone }: { src: string | null; alt: string; tone: string }) {
+function StoreLogoFrame({
+  src,
+  alt,
+  tone,
+  softTone,
+}: {
+  src: string | null;
+  alt: string;
+  tone: string;
+  softTone: string;
+}) {
   return (
     <div
       className="relative h-[88px] w-[88px] shrink-0 rounded-xl border-2 overflow-hidden shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
@@ -436,8 +561,12 @@ function StoreLogoFrame({ src, alt, tone }: { src: string | null; alt: string; t
       {src ? (
         <div className="absolute inset-0 p-2 pt-3">
           <div
-            className="relative h-full w-full bg-white rounded-md border grid place-items-center"
-            style={{ borderColor: "var(--color-mountain-shadow, #5C5546)" }}
+            className="relative h-full w-full rounded-md border grid place-items-center"
+            style={{
+              borderColor: "var(--color-mountain-shadow, #5C5546)",
+              backgroundColor: softTone,
+              isolation: "isolate",
+            }}
           >
             <div className="relative h-3/5 w-3/4">
               <Image
@@ -446,6 +575,7 @@ function StoreLogoFrame({ src, alt, tone }: { src: string | null; alt: string; t
                 fill
                 sizes="80px"
                 className="object-contain"
+                style={{ mixBlendMode: "multiply" }}
               />
             </div>
           </div>
@@ -474,22 +604,3 @@ function StoreLogoFrame({ src, alt, tone }: { src: string | null; alt: string; t
   );
 }
 
-function SectionHeader({ title, caption }: { title: string; caption: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <h2
-        className="text-[26px] sm:text-[32px] leading-tight font-extrabold tracking-[-0.02em]"
-        style={{ color: "var(--color-data-ink, #3B342A)" }}
-      >
-        {title}
-      </h2>
-      <span
-        className="text-[12px] font-semibold uppercase tracking-[0.1em]"
-        style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
-      >
-        {caption}
-      </span>
-      <div className="pixel-bar-thin mt-2" aria-hidden />
-    </div>
-  );
-}

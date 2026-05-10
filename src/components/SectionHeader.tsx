@@ -1,39 +1,32 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
-
+/**
+ * SectionHeader for the Iteration 4 register (warm-sandy + pixel chrome).
+ * Caption is optional; when omitted or empty, only the title and the
+ * pixel-bar accent render.
+ */
 export function SectionHeader({
   title,
   caption,
-  trailing,
-  className,
 }: {
-  title: ReactNode;
-  caption?: ReactNode;
-  trailing?: ReactNode;
-  className?: string;
+  title: string;
+  caption?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "flex items-end justify-between gap-4 flex-wrap",
-        className
-      )}
-    >
-      <div className="flex flex-col gap-1.5 min-w-0">
-        <h2 className="text-[28px] sm:text-[36px] font-extrabold tracking-[-0.04em] leading-[1.05] text-ink">
-          {title}
-        </h2>
-        {caption ? (
-          <p className="text-[13px] sm:text-[15px] font-medium text-ink-mute leading-snug">
-            {caption}
-          </p>
-        ) : null}
-      </div>
-      {trailing ? (
-        <div className="text-[11px] font-bold uppercase tracking-[0.04em] text-ink-mute shrink-0">
-          {trailing}
-        </div>
+    <div className="flex flex-col gap-1">
+      <h2
+        className="text-[26px] sm:text-[32px] leading-tight font-extrabold tracking-[-0.02em]"
+        style={{ color: "var(--color-data-ink, #3B342A)" }}
+      >
+        {title}
+      </h2>
+      {caption ? (
+        <span
+          className="text-[12px] font-semibold uppercase tracking-[0.1em]"
+          style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
+        >
+          {caption}
+        </span>
       ) : null}
+      <div className="pixel-bar-thin mt-2" aria-hidden />
     </div>
   );
 }

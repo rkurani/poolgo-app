@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, Camera, Plus, Calendar } from "lucide-react";
+import { SectionHeader } from "@/components/SectionHeader";
 
 const VITALS = [
   { chem: "pH", value: "7.4", unit: "", target: "7.2–7.6", state: "in-range", source: "imported" },
@@ -52,7 +53,7 @@ const CHART_DATA: { day: number; pH: number; tested: boolean }[] = [
 
 type Test = {
   id: string;
-  source: { name: string; logo: string | null; tone: string };
+  source: { name: string; logo: string | null; tone: string; softTone?: string };
   when: string;
   summary: string;
   detail: string;
@@ -61,24 +62,34 @@ type Test = {
 const TESTS: Test[] = [
   {
     id: "leslies-1",
-    source: { name: "Leslie's", logo: "/assets/leslies.png", tone: "imported" },
+    source: {
+      name: "Leslie's",
+      logo: "/assets/leslies.png",
+      tone: "imported",
+      softTone: "var(--color-leslies-soft, #DEE8F7)",
+    },
     when: "2 days ago",
-    summary: "Free water test · all in range",
+    summary: "Free water test, all in range",
     detail: "FC 2.4 · pH 7.4 · TA 90 · CYA 42 · CH 280. Carlos picked this up Tuesday on his way through.",
   },
   {
     id: "carlos-1",
     source: { name: "Carlos M.", logo: "/assets/folks/carlos-portrait.png", tone: "human" },
     when: "5 days ago",
-    summary: "Weekly visit · pH balanced 7.8 → 7.4",
-    detail: "Refilled tabs (3 lbs). Backwashed Hayward sand filter. Noted CYA climbing — flagged for partial drain Tue.",
+    summary: "Weekly visit, pH balanced 7.8 to 7.4",
+    detail: "Refilled tabs (3 lbs). Backwashed Hayward sand filter. Noted CYA climbing, flagged for partial drain Tue.",
   },
   {
     id: "live-1",
-    source: { name: "IntelliFlo3 + ORP probe", logo: "/assets/intelliflo3.png", tone: "live" },
+    source: {
+      name: "IntelliFlo3 + ORP probe",
+      logo: "/assets/intelliflo3.png",
+      tone: "live",
+      softTone: "var(--color-pentair-soft, #E5ECF4)",
+    },
     when: "7 minutes ago",
-    summary: "ORP 720 mV · stable",
-    detail: "On-pad telemetry — readout from the Pentair salt-cell flow loop. Refreshes every 90 seconds.",
+    summary: "ORP 720 mV, stable",
+    detail: "On-pad telemetry from the Pentair salt-cell flow loop. Refreshes every 90 seconds.",
   },
 ];
 
@@ -102,7 +113,7 @@ const OBSERVATIONS: Observation[] = [
     id: "lin-2",
     who: "Lin (you)",
     when: "Apr 18 · 8:02 AM",
-    caption: "Tile line — small white film. Worth a look on Tuesday.",
+    caption: "Tile line, small white film. Worth a look on Tuesday.",
     photo: "/assets/pool-hero.jpg",
   },
 ];
@@ -143,15 +154,15 @@ export default function CarePage() {
           </h1>
           <p className="text-[16px] sm:text-[19px] font-medium leading-snug max-w-[640px]"
              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-            CYA crept up to 42 ppm — Carlos drops by Tuesday for the partial drain. Then we&rsquo;re caught
-            up. Free chlorine, pH, and alkalinity all sitting in the middle of their bands.
+            CYA crept up to 42 ppm. Carlos drops by Tuesday for the partial drain, then we&rsquo;re
+            caught up. Free chlorine, pH, and alkalinity all sitting in the middle of their bands.
           </p>
           <div className="pixel-bar mt-3" aria-hidden />
         </header>
 
         {/* Live vitals */}
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Right now." caption="four readings · sources mixed (live, imported, store-tested)" />
+          <SectionHeader title="Right now." />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {VITALS.map((v) => (
               <div
@@ -203,7 +214,7 @@ export default function CarePage() {
 
         {/* 30-day chart */}
         <section className="flex flex-col gap-5">
-          <SectionHeader title="pH · last 30 days." caption="smooth line, pixel-stepped grid · ideal band 7.2–7.6" />
+          <SectionHeader title="pH, last 30 days." caption="ideal band 7.2 to 7.6" />
           <div
             className="rounded-2xl border-[3px] p-5 sm:p-6 shadow-[6px_6px_0_0_rgba(59,52,42,0.12)]"
             style={{
@@ -229,7 +240,7 @@ export default function CarePage() {
 
         {/* Recent water tests with real-logo frames */}
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Recent tests." caption="three sources · real logos in pixel frames" />
+          <SectionHeader title="Recent tests." />
           <div className="flex flex-col gap-4">
             {TESTS.map((t) => (
               <div
@@ -240,7 +251,12 @@ export default function CarePage() {
                   borderColor: "var(--color-card-border, #B89B6A)",
                 }}
               >
-                <LogoFrame src={t.source.logo} alt={t.source.name} tone={SOURCE_TONE[t.source.tone]} />
+                <LogoFrame
+                  src={t.source.logo}
+                  alt={t.source.name}
+                  tone={SOURCE_TONE[t.source.tone]}
+                  softTone={t.source.softTone}
+                />
                 <div className="flex flex-col gap-1.5 flex-1">
                   <div className="flex items-baseline justify-between gap-3 flex-wrap">
                     <div className="flex items-center gap-2.5">
@@ -277,7 +293,7 @@ export default function CarePage() {
 
         {/* Photos / observations */}
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Your observations." caption="real photos in pixel frames · the world&rsquo;s visual register holds" />
+          <SectionHeader title="Your observations." />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {OBSERVATIONS.map((o) => (
               <PhotoFrame key={o.id} obs={o} />
@@ -299,7 +315,7 @@ export default function CarePage() {
               <span className="text-[15px] font-extrabold">Add an observation</span>
               <span className="text-[12px] text-center max-w-[200px]"
                     style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-                Snap a photo of the water, the tile, an algae spot — it lands here in a pixel frame.
+                Snap a photo of the water, the tile, an algae spot. It lands here.
               </span>
             </button>
           </div>
@@ -380,11 +396,25 @@ export default function CarePage() {
  * chunky pixel-chrome frame. Real logos appear as themselves; the frame is the
  * connective tissue that anchors them in the pixel-art world.
  */
-function LogoFrame({ src, alt, tone, size = 80 }: { src: string | null; alt: string; tone: string; size?: number }) {
+function LogoFrame({
+  src,
+  alt,
+  tone,
+  softTone,
+  size = 80,
+}: {
+  src: string | null;
+  alt: string;
+  tone: string;
+  softTone?: string;
+  size?: number;
+}) {
   // Pixel portraits fill edge-to-edge inside the warm chip.
-  // Real product/business logos sit on a clean white inner panel so their
-  // baked-in white background reads as intentional plaque, not bleed.
+  // Real product/business logos sit on a brand-tinted inner plaque with
+  // mix-blend-mode: multiply, so the logo's white background dissolves into
+  // the brand's soft tone instead of clashing with the warm outer frame.
   const isPortrait = src ? src.includes("portrait") : false;
+  const plaqueBg = softTone || "white";
   return (
     <div
       className="relative rounded-xl border-2 overflow-hidden shrink-0 shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
@@ -413,8 +443,12 @@ function LogoFrame({ src, alt, tone, size = 80 }: { src: string | null; alt: str
         ) : (
           <div className="absolute inset-0 p-2 pt-3">
             <div
-              className="relative h-full w-full bg-white rounded-md border grid place-items-center"
-              style={{ borderColor: "var(--color-mountain-shadow, #5C5546)" }}
+              className="relative h-full w-full rounded-md border grid place-items-center"
+              style={{
+                borderColor: "var(--color-mountain-shadow, #5C5546)",
+                backgroundColor: plaqueBg,
+                isolation: "isolate",
+              }}
             >
               <div className="relative h-3/5 w-4/5">
                 <Image
@@ -423,6 +457,7 @@ function LogoFrame({ src, alt, tone, size = 80 }: { src: string | null; alt: str
                   fill
                   sizes="80px"
                   className="object-contain"
+                  style={{ mixBlendMode: "multiply" }}
                 />
               </div>
             </div>
@@ -480,8 +515,8 @@ function PhotoFrame({ obs }: { obs: Observation }) {
 }
 
 /**
- * Inline SVG pH chart — smooth line, pixel-stepped grid, citrus dots on tested
- * days. Data integrity stays editorial; chrome stays pixelated.
+ * Inline SVG pH chart with a smooth line, pixel-stepped grid, and citrus
+ * dots on tested days. Data integrity stays editorial, chrome stays pixelated.
  */
 function PHChart() {
   const W = 800;
@@ -603,22 +638,3 @@ function LegendDot({ color, label, filled = false }: { color: string; label: str
   );
 }
 
-function SectionHeader({ title, caption }: { title: string; caption: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <h2
-        className="text-[26px] sm:text-[32px] leading-tight font-extrabold tracking-[-0.02em]"
-        style={{ color: "var(--color-data-ink, #3B342A)" }}
-      >
-        {title}
-      </h2>
-      <span
-        className="text-[12px] font-semibold uppercase tracking-[0.1em]"
-        style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
-      >
-        {caption}
-      </span>
-      <div className="pixel-bar-thin mt-2" aria-hidden />
-    </div>
-  );
-}

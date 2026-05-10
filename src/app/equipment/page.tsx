@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { equipment } from "@/lib/data/equipment";
 import type { EquipmentTile } from "@/lib/types";
+import { SectionHeader } from "@/components/SectionHeader";
 
 const STATE_TONE: Record<string, string> = {
   live: "var(--color-source-live)",
@@ -69,7 +70,7 @@ export default function EquipmentPage() {
         </section>
 
         <section className="flex flex-col gap-3">
-          <SectionHeader title="The five systems." caption="tap any unit to dive into its details and live readout" />
+          <SectionHeader title="The five systems." />
         </section>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
@@ -79,7 +80,7 @@ export default function EquipmentPage() {
         </div>
 
         <section className="flex flex-col gap-5 mt-2">
-          <SectionHeader title="Scenes." caption="four presets · coordinate all 5 systems with one tap" />
+          <SectionHeader title="Scenes." />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {SCENES.map((s) => (
               <button
@@ -177,25 +178,6 @@ function UnitCard({ unit }: { unit: EquipmentTile }) {
   );
 }
 
-function SectionHeader({ title, caption }: { title: string; caption: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <h2
-        className="text-[26px] sm:text-[32px] leading-tight font-extrabold tracking-[-0.02em]"
-        style={{ color: "var(--color-data-ink, #3B342A)" }}
-      >
-        {title}
-      </h2>
-      <span
-        className="text-[12px] font-semibold uppercase tracking-[0.1em]"
-        style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
-      >
-        {caption}
-      </span>
-      <div className="pixel-bar-thin mt-2" aria-hidden />
-    </div>
-  );
-}
 
 const SCENES = [
   {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Compass, Droplet, Settings2, Users } from "lucide-react";
+import { SectionHeader } from "@/components/SectionHeader";
 
 const QUICK_LINKS = [
   { Icon: Droplet, title: "Care", body: "pH 7.4 · ORP 720 · all green", href: "/care", tone: "var(--color-source-ai)" },
@@ -26,8 +27,8 @@ export default function HomePage() {
           </h1>
           <p className="text-[16px] sm:text-[19px] font-medium leading-snug max-w-[640px]"
              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-            Pool&rsquo;s healthy. CYA crept up to 42 ppm — Carlos is on Tuesday&rsquo;s route, he&rsquo;ll do the
-            partial drain. Then we&rsquo;re caught up.
+            Pool&rsquo;s healthy. CYA crept up to 42 ppm. Carlos is on Tuesday&rsquo;s route, he&rsquo;ll
+            do the partial drain. Then we&rsquo;re caught up.
           </p>
           <div className="pixel-bar mt-3" aria-hidden />
         </header>
@@ -77,7 +78,7 @@ export default function HomePage() {
         </Link>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Today, at a glance." caption="three live readouts · all green" />
+          <SectionHeader title="Today, at a glance." />
           <div className="grid grid-cols-3 gap-3 sm:gap-4">
             {[
               { label: "Water", value: "pH 7.4", sub: "ORP 720", tone: "var(--color-source-ai)" },
@@ -118,7 +119,7 @@ export default function HomePage() {
         </section>
 
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Or jump straight to." caption="three primary surfaces · same data, different lens" />
+          <SectionHeader title="Or jump straight to." />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
             {QUICK_LINKS.map((q) => (
               <Link
@@ -153,22 +154,3 @@ export default function HomePage() {
   );
 }
 
-function SectionHeader({ title, caption }: { title: string; caption: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <h2
-        className="text-[26px] sm:text-[32px] leading-tight font-extrabold tracking-[-0.02em]"
-        style={{ color: "var(--color-data-ink, #3B342A)" }}
-      >
-        {title}
-      </h2>
-      <span
-        className="text-[12px] font-semibold uppercase tracking-[0.1em]"
-        style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
-      >
-        {caption}
-      </span>
-      <div className="pixel-bar-thin mt-2" aria-hidden />
-    </div>
-  );
-}

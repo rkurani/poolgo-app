@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, Activity, Wrench, Calendar, FileText, Zap, ShieldCheck, BadgeCheck } from "lucide-react";
+import { SectionHeader } from "@/components/SectionHeader";
 
 const STATS = [
   { label: "RPM", value: "1,750", caption: "Stage B" },
@@ -13,7 +14,7 @@ const SCHEDULE = [
   { window: "06:00–08:30", stage: "Stage A · 1,100 RPM", note: "Slow morning circulate" },
   { window: "08:30–11:30", stage: "Stage B · 1,750 RPM", note: "Filtration · current" },
   { window: "11:30–14:00", stage: "Stage C · 2,400 RPM", note: "Cleaner runs piggyback" },
-  { window: "14:00–18:00", stage: "Idle", note: "Off — solar shoulder" },
+  { window: "14:00–18:00", stage: "Idle", note: "Off, solar shoulder" },
   { window: "18:00–22:00", stage: "Stage A · 1,100 RPM", note: "Evening circulate" },
 ];
 
@@ -57,7 +58,7 @@ export default function IntelliFlo3Page() {
           </span>
         </div>
 
-        {/* Zoom hero — pixel portrait → photoreal product */}
+        {/* Zoom hero. Pixel portrait, then photoreal product. */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5">
           <div
             className="relative aspect-square rounded-2xl overflow-hidden border-[3px] shadow-[6px_6px_0_0_rgba(59,52,42,0.18)]"
@@ -109,10 +110,22 @@ export default function IntelliFlo3Page() {
             Certified, branded, on warranty
           </span>
           <div className="flex flex-wrap gap-3 sm:gap-4 items-stretch">
-            <RealLogoChip src="/assets/pentair.jpg" alt="Pentair" tone="var(--brand-accent)" tagline="Authentic OEM" />
+            <RealLogoChip
+              src="/assets/pentair.jpg"
+              alt="Pentair"
+              tone="var(--brand-accent)"
+              softTone="var(--color-pentair-soft, #E5ECF4)"
+              tagline="Authentic OEM"
+            />
             <WordChip Icon={ShieldCheck} title="4-yr warranty" body="Active until Sep 2026" tone="var(--color-source-live)" />
             <WordChip Icon={BadgeCheck} title="Carlos certified" body="Authorized service" tone="var(--color-source-human)" />
-            <RealLogoChip src="/assets/leslies.png" alt="Leslie's" tone="var(--color-leslies, #0046A8)" tagline="Parts in stock locally" />
+            <RealLogoChip
+              src="/assets/leslies.png"
+              alt="Leslie's"
+              tone="var(--color-leslies, #0046A8)"
+              softTone="var(--color-leslies-soft, #DEE8F7)"
+              tagline="Parts in stock locally"
+            />
           </div>
         </section>
 
@@ -142,7 +155,7 @@ export default function IntelliFlo3Page() {
 
         {/* Live stats */}
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Live, right now." caption="last sync 7 seconds ago · pulled from on-pad telemetry" />
+          <SectionHeader title="Live, right now." caption="last sync 7 seconds ago" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {STATS.map((s) => (
               <div
@@ -180,7 +193,7 @@ export default function IntelliFlo3Page() {
 
         {/* Schedule */}
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Today's schedule." caption="five stages · the pump knows what to do" />
+          <SectionHeader title="Today's schedule." />
           <div
             className="rounded-2xl border-2 overflow-hidden"
             style={{
@@ -230,7 +243,7 @@ export default function IntelliFlo3Page() {
 
         {/* Service history */}
         <section className="flex flex-col gap-5">
-          <SectionHeader title="Service history." caption="every visit, every firmware bump, every part swap" />
+          <SectionHeader title="Service history." />
           <div className="flex flex-col">
             {HISTORY.map((row, i) => (
               <div
@@ -270,7 +283,7 @@ export default function IntelliFlo3Page() {
 
         {/* Quick actions */}
         <section className="flex flex-col gap-5">
-          <SectionHeader title="What you can do." caption="three quick actions · everything else is on the schedule" />
+          <SectionHeader title="What you can do." />
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             {[
               { Icon: Calendar, title: "Book service", body: "Carlos · Tuesday route", href: "/folks/carlos-redlands" },
@@ -313,7 +326,19 @@ export default function IntelliFlo3Page() {
  * RealLogoChip: a real brand logo (Pentair, Leslie's) sits inside a chunky
  * pixel-chrome card. The frame is what anchors the real mark in the world.
  */
-function RealLogoChip({ src, alt, tone, tagline }: { src: string; alt: string; tone: string; tagline: string }) {
+function RealLogoChip({
+  src,
+  alt,
+  tone,
+  softTone,
+  tagline,
+}: {
+  src: string;
+  alt: string;
+  tone: string;
+  softTone: string;
+  tagline: string;
+}) {
   return (
     <div
       className="relative rounded-xl border-2 pl-2 pr-4 py-2 flex items-center gap-3 shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
@@ -328,11 +353,22 @@ function RealLogoChip({ src, alt, tone, tagline }: { src: string; alt: string; t
         aria-hidden
       />
       <div
-        className="relative h-12 w-16 shrink-0 rounded-md border bg-white grid place-items-center mt-1 overflow-hidden"
-        style={{ borderColor: "var(--color-mountain-shadow, #5C5546)" }}
+        className="relative h-12 w-16 shrink-0 rounded-md border grid place-items-center mt-1 overflow-hidden"
+        style={{
+          borderColor: "var(--color-mountain-shadow, #5C5546)",
+          backgroundColor: softTone,
+          isolation: "isolate",
+        }}
       >
         <div className="relative h-9 w-12">
-          <Image src={src} alt={alt} fill sizes="48px" className="object-contain" />
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="48px"
+            className="object-contain"
+            style={{ mixBlendMode: "multiply" }}
+          />
         </div>
       </div>
       <div className="flex flex-col gap-0">
@@ -381,22 +417,3 @@ function WordChip({ Icon, title, body, tone }: { Icon: React.ComponentType<{ siz
   );
 }
 
-function SectionHeader({ title, caption }: { title: string; caption: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <h2
-        className="text-[26px] sm:text-[32px] leading-tight font-extrabold tracking-[-0.02em]"
-        style={{ color: "var(--color-data-ink, #3B342A)" }}
-      >
-        {title}
-      </h2>
-      <span
-        className="text-[12px] font-semibold uppercase tracking-[0.1em]"
-        style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
-      >
-        {caption}
-      </span>
-      <div className="pixel-bar-thin mt-2" aria-hidden />
-    </div>
-  );
-}
