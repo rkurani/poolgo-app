@@ -42,3 +42,12 @@ html, body {
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 *, *::before, *::after { box-sizing: border-box; }
+
+@keyframes canvasPulse {
+  0%   { box-shadow: 0 0 0 0 currentColor; opacity: 0.6; }
+  70%  { box-shadow: 0 0 0 14px transparent; opacity: 0; }
+  100% { box-shadow: 0 0 0 0 transparent; opacity: 0; }
+}
+.animate-canvasPulse {
+  animation: canvasPulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
