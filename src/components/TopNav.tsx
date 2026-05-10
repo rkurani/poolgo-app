@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const TABS = [
   { href: "/", label: "My Pool" },
   { href: "/care", label: "Care" },
   { href: "/equipment", label: "Equipment" },
-  { href: "/routines", label: "Routines" },
   { href: "/folks", label: "Folks" },
-  { href: "/inbox", label: "Inbox" },
+  { href: "/connect", label: "Connect" },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -21,23 +21,23 @@ function isActive(pathname: string, href: string) {
 export function TopNav() {
   const pathname = usePathname();
   return (
-    <nav className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-background px-8 py-4">
-      <Link href="/" className="text-[18px] font-bold tracking-[-0.03em]">
-        PoolGo<span className="font-extrabold text-primary">.</span>
+    <nav className="hidden md:flex sticky top-0 z-10 items-center justify-between bg-surface px-10 py-4">
+      <Link href="/" className="text-[22px] font-extrabold tracking-[-0.03em] text-ink">
+        PoolGo<span className="text-primary">.</span>
       </Link>
-      <div className="flex gap-1">
+      <div className="flex items-center gap-8">
         {TABS.map((tab) => {
           const active = isActive(pathname, tab.href);
           return (
             <Link
               key={tab.href}
               href={tab.href}
-              className={[
-                "rounded-md px-[14px] py-2 text-[14px] font-medium tracking-[-0.005em] transition-colors",
+              className={cn(
+                "text-[14px] tracking-[-0.005em] transition-colors",
                 active
-                  ? "bg-ink text-white"
-                  : "text-ink-mute hover:bg-surface hover:text-ink",
-              ].join(" ")}
+                  ? "font-bold text-ink"
+                  : "font-medium text-ink-mute hover:text-ink"
+              )}
             >
               {tab.label}
             </Link>
@@ -45,17 +45,19 @@ export function TopNav() {
         })}
       </div>
       <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[7px] rounded-full bg-surface-2 px-3 py-[6px]">
+          <span className="h-[7px] w-[7px] rounded-full bg-source-live" />
+          <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-ink">
+            Big Blue · all healthy
+          </span>
+        </div>
         <button
           aria-label="notifications"
-          className="relative grid h-9 w-9 place-items-center rounded-md bg-surface text-ink"
+          className="grid h-9 w-9 place-items-center text-ink"
         >
-          <Bell size={16} strokeWidth={1.6} />
-          <span className="absolute right-[9px] top-2 h-[7px] w-[7px] rounded-full border-[1.5px] border-surface bg-error" />
+          <Bell size={18} strokeWidth={1.6} />
         </button>
-        <div
-          className="grid h-9 w-9 place-items-center rounded-full text-[13px] font-bold text-white"
-          style={{ background: "linear-gradient(135deg, #2A6098, #0E2F55)" }}
-        >
+        <div className="grid h-9 w-9 place-items-center rounded-full bg-ink text-[13px] font-bold text-white">
           RK
         </div>
       </div>

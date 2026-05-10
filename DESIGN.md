@@ -7,17 +7,20 @@ description: >
   PoolGo's own cyan is reserved for accent and concierge moments.
 
 colors:
-  # surface
+  # surface (warm cream — iter 6 direction)
   background: "#FFFFFF"
-  surface: "#FAFAFA"
-  surface-2: "#F5F5F4"
-  line: "#ECECEC"
-  line-2: "#D8D8D8"
+  surface: "#F8F4EE"          # oatmilk warm (was #FAFAFA cool gray)
+  surface-2: "#F1ECE3"        # deeper cream (was #F5F5F4)
+  cream: "#FFFBF7"            # NEW · soft block bg, Glossier-cream
+  blush: "#F4EFEB"            # NEW · featured callouts
+  line: "#EDE7DC"             # warm hairline (was #ECECEC); used at section transitions only, never as card outlines
+  line-2: "#D8D0BF"
 
-  # ink
-  ink: "#0F1115"
+  # ink (warmed near-black for cream surface)
+  ink: "#1B1814"              # was #0F1115
   ink-soft: "#45494F"
   ink-mute: "#6B7079"
+  ink-faint: "#9C9489"        # NEW · for tertiary captions and inactive states
   on-ink: "#FFFFFF"
 
   # primary (PoolGo accent)

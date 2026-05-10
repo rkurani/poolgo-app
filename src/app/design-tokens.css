@@ -4,13 +4,16 @@
 @theme {
   /* colors */
   --color-background: #FFFFFF;
-  --color-surface: #FAFAFA;
-  --color-surface-2: #F5F5F4;
-  --color-line: #ECECEC;
-  --color-line-2: #D8D8D8;
-  --color-ink: #0F1115;
+  --color-surface: #F8F4EE;
+  --color-surface-2: #F1ECE3;
+  --color-cream: #FFFBF7;
+  --color-blush: #F4EFEB;
+  --color-line: #EDE7DC;
+  --color-line-2: #D8D0BF;
+  --color-ink: #1B1814;
   --color-ink-soft: #45494F;
   --color-ink-mute: #6B7079;
+  --color-ink-faint: #9C9489;
   --color-on-ink: #FFFFFF;
   --color-primary: #1FA0BF;
   --color-primary-soft: #E2F3F8;

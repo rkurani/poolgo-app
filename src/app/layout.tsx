@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import { TopNav } from "@/components/TopNav";
+import { MobileTabBar } from "@/components/MobileTabBar";
 import "./globals.css";
 
 const interTight = Inter_Tight({
@@ -23,9 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${interTight.variable} h-full`}>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-surface text-ink">
         <TopNav />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-24 md:pb-0">{children}</main>
+        <MobileTabBar />
       </body>
     </html>
   );
