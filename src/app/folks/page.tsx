@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, MapPin, Star, Clock } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, ArrowRight, MapPin, Star, Clock, Upload } from "lucide-react";
 
 type Pro = {
   id: string;
@@ -65,6 +66,8 @@ type Store = {
   hours: string;
   inventory: string[];
   badge: string;
+  logo: string | null;
+  brandTone: string;
 };
 
 const STORES: Store[] = [
@@ -76,6 +79,8 @@ const STORES: Store[] = [
     hours: "Open until 7pm",
     inventory: ["3-inch tabs · 50lb · in stock", "Salt 40lb · 3 bags", "Pentair filter cartridges"],
     badge: "Free water test",
+    logo: "/assets/leslies.png",
+    brandTone: "var(--color-leslies, #0046A8)",
   },
   {
     id: "pinch-redlands",
@@ -85,6 +90,8 @@ const STORES: Store[] = [
     hours: "Open until 5pm",
     inventory: ["Liquid chlorine · 12 jugs", "Stabilizer · 1 bag", "Hayward filter sand"],
     badge: "Free water test · weekend booking",
+    logo: null,
+    brandTone: "var(--color-mountain-shadow, #5C5546)",
   },
 ];
 
@@ -338,21 +345,28 @@ function StoreCard({ store }: { store: Store }) {
         borderColor: "var(--color-mountain-shadow, #5C5546)",
       }}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-0.5">
-          <h3 className="text-[20px] font-extrabold tracking-[-0.01em]"
-              style={{ color: "var(--color-data-ink, #3B342A)" }}>
-            {store.name}
-          </h3>
+      <div className="flex items-start gap-4">
+        <StoreLogoFrame
+          src={store.logo}
+          alt={store.name}
+          tone={store.brandTone}
+        />
+        <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+          <div className="flex items-baseline justify-between gap-3">
+            <h3 className="text-[20px] font-extrabold tracking-[-0.01em] truncate"
+                style={{ color: "var(--color-data-ink, #3B342A)" }}>
+              {store.name}
+            </h3>
+            <span className="font-pixel text-[10px] tracking-[0.08em] shrink-0"
+                  style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
+              {store.miles}
+            </span>
+          </div>
           <span className="text-[12px] font-semibold uppercase tracking-[0.05em]"
                 style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
             {store.type}
           </span>
         </div>
-        <span className="font-pixel text-[10px] tracking-[0.08em] shrink-0 mt-1"
-              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-          {store.miles}
-        </span>
       </div>
 
       <div className="flex items-center gap-2 text-[12px] font-bold"
@@ -396,6 +410,66 @@ function StoreCard({ store }: { store: Store }) {
           <MapPin size={12} strokeWidth={2.5} />
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * StoreLogoFrame: real logo on a clean white plaque inside a chunky pixel frame.
+ * Empty state (logo: null) shows an upload-prompt placeholder so onboarding
+ * without a logo has a visual home.
+ */
+function StoreLogoFrame({ src, alt, tone }: { src: string | null; alt: string; tone: string }) {
+  return (
+    <div
+      className="relative h-[88px] w-[88px] shrink-0 rounded-xl border-2 overflow-hidden shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
+      style={{
+        backgroundColor: "var(--color-data-cream-2, #E5D7BE)",
+        borderColor: "var(--color-mountain-shadow, #5C5546)",
+      }}
+    >
+      <span
+        className="absolute top-0 left-0 right-0 z-10 h-[5px]"
+        style={{ backgroundColor: tone }}
+        aria-hidden
+      />
+      {src ? (
+        <div className="absolute inset-0 p-2 pt-3">
+          <div
+            className="relative h-full w-full bg-white rounded-md border grid place-items-center"
+            style={{ borderColor: "var(--color-mountain-shadow, #5C5546)" }}
+          >
+            <div className="relative h-3/5 w-3/4">
+              <Image
+                src={src}
+                alt={alt}
+                fill
+                sizes="80px"
+                className="object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="absolute inset-0 p-2 pt-3">
+          <div
+            className="relative h-full w-full rounded-md border-2 border-dashed grid place-items-center text-center"
+            style={{
+              borderColor: "var(--color-mountain-shadow, #5C5546)",
+              backgroundColor: "rgba(255,255,255,0.5)",
+            }}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <Upload size={14} strokeWidth={2.5}
+                      style={{ color: "var(--color-mountain-shadow, #5C5546)" }} />
+              <span className="font-pixel text-[7px] uppercase tracking-[0.1em] leading-tight px-1"
+                    style={{ color: "var(--color-mountain-shadow, #5C5546)" }}>
+                add logo
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

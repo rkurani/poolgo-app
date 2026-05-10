@@ -316,7 +316,7 @@ export default function IntelliFlo3Page() {
 function RealLogoChip({ src, alt, tone, tagline }: { src: string; alt: string; tone: string; tagline: string }) {
   return (
     <div
-      className="relative rounded-xl border-2 px-4 py-3 flex items-center gap-3 shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
+      className="relative rounded-xl border-2 pl-2 pr-4 py-2 flex items-center gap-3 shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
       style={{
         backgroundColor: "var(--color-data-cream-2, #E5D7BE)",
         borderColor: "var(--color-mountain-shadow, #5C5546)",
@@ -327,8 +327,13 @@ function RealLogoChip({ src, alt, tone, tagline }: { src: string; alt: string; t
         style={{ backgroundColor: tone }}
         aria-hidden
       />
-      <div className="relative h-9 w-12 shrink-0 mt-1">
-        <Image src={src} alt={alt} fill sizes="48px" className="object-contain" />
+      <div
+        className="relative h-12 w-16 shrink-0 rounded-md border bg-white grid place-items-center mt-1 overflow-hidden"
+        style={{ borderColor: "var(--color-mountain-shadow, #5C5546)" }}
+      >
+        <div className="relative h-9 w-12">
+          <Image src={src} alt={alt} fill sizes="48px" className="object-contain" />
+        </div>
       </div>
       <div className="flex flex-col gap-0">
         <span className="text-[13px] font-extrabold tracking-[-0.005em]"

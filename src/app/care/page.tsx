@@ -381,6 +381,10 @@ export default function CarePage() {
  * connective tissue that anchors them in the pixel-art world.
  */
 function LogoFrame({ src, alt, tone, size = 80 }: { src: string | null; alt: string; tone: string; size?: number }) {
+  // Pixel portraits fill edge-to-edge inside the warm chip.
+  // Real product/business logos sit on a clean white inner panel so their
+  // baked-in white background reads as intentional plaque, not bleed.
+  const isPortrait = src ? src.includes("portrait") : false;
   return (
     <div
       className="relative rounded-xl border-2 overflow-hidden shrink-0 shadow-[3px_3px_0_0_rgba(59,52,42,0.18)]"
@@ -392,19 +396,38 @@ function LogoFrame({ src, alt, tone, size = 80 }: { src: string | null; alt: str
       }}
     >
       <span
-        className="absolute top-0 left-0 right-0 h-[4px]"
+        className="absolute top-0 left-0 right-0 z-10 h-[4px]"
         style={{ backgroundColor: tone }}
         aria-hidden
       />
       {src ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="80px"
-          className="object-contain p-2"
-          style={{ imageRendering: src.includes("portrait") ? "pixelated" : "auto" }}
-        />
+        isPortrait ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="80px"
+            className="object-cover"
+            style={{ imageRendering: "pixelated" }}
+          />
+        ) : (
+          <div className="absolute inset-0 p-2 pt-3">
+            <div
+              className="relative h-full w-full bg-white rounded-md border grid place-items-center"
+              style={{ borderColor: "var(--color-mountain-shadow, #5C5546)" }}
+            >
+              <div className="relative h-3/5 w-4/5">
+                <Image
+                  src={src}
+                  alt={alt}
+                  fill
+                  sizes="80px"
+                  className="object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        )
       ) : (
         <div className="h-full w-full grid place-items-center font-pixel text-[12px]"
              style={{ color: "var(--color-mountain-shadow, #5C5546)" }}>
