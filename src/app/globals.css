@@ -106,6 +106,20 @@ button { font-family: inherit; cursor: pointer; }
   animation: orbPulse 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Palm-frond breeze — anchored at the trunk base. Slight rotation,
+   slight x-skew, slow loop. Left and right palms get different timings
+   so they aren't synchronized. */
+@keyframes palmSwayL {
+  0%   { transform: rotate(-1.5deg) skewX(0deg); }
+  50%  { transform: rotate(2deg) skewX(1deg); }
+  100% { transform: rotate(-1.5deg) skewX(0deg); }
+}
+@keyframes palmSwayR {
+  0%   { transform: rotate(1.5deg) skewX(0deg); }
+  50%  { transform: rotate(-2deg) skewX(-1deg); }
+  100% { transform: rotate(1.5deg) skewX(0deg); }
+}
+
 /* Per-city palette overrides — applied via data-city on a wrapper div.
    See iterations.md "Local-page pixel-art generation as SEO moat" for
    the architecture context. */
