@@ -219,6 +219,76 @@ Concept exploring. First macro AI image rendered in Pencil (frame `m3DaR` in `po
 
 ---
 
+## Iteration 4 — Visual system pivot (Sims/Pokemon spectrum, anti-AI moat)
+
+**This iteration replaces Iteration 2's "warm cream" direction.** The cream foundation was fighting the pixel-art world layer that emerged in Iteration 3. More fundamentally, cream + Inter + line charts + ghost buttons IS the AI-app default of 2026 — Notion, Linear, Cursor, every YC AI-tools startup. Building there means looking like the herd. The pivot is to a visual identity that lives in a different lineage entirely: 16-bit RPG / Pokemon-era domestic pixel art, with photoreal product detail at the leaf level.
+
+### Audience anchor — Gen X / Older Millennial, not Boomer
+
+- The pool-tech early adopter market is 38–58. Boomers either pay a service tech or won't adopt a sophisticated app at all. Pokemon/SNES/Sims/Animal Crossing/Stardew Valley are the *visual ancestors of warm pixel art that depicts a domestic life worth caring for* — perfectly tuned to this cohort.
+- Atari/boomer (vector-on-black, Pong/Asteroids) is the wrong reference. That's harsh-arcade-alien, not warm-domestic.
+- Going millennial/Gen X with the Pokemon register positions PoolGo against a generation of poolside decision-makers who are sick of ChatGPT-clone design. Anti-AI-app aesthetic = the moat.
+
+### Foundation — drop cream, go warm sandy/dusty
+
+- `#D9C9A6` to `#C9B894` range — weathered concrete, sun-bleached pool deck after three summers. Already the tonality your macro pixel-art image uses (look at the patio tones). Harmonizes with pixel art instead of fighting it.
+- Cream becomes an *accent* for data-layer cards, not the underlying canvas. Form sheets fill with cream on the sandy-warm body.
+- Higher saturation overall on accent colors — Pokemon Gen 2 palette as the reference (warm reds, deep blues, ochre, mossy greens). The OEM colors (Pentair navy, Hayward gold) slot directly into this register because they were designed by mid-century industrial brands; they belong here.
+
+### Pixel as a spectrum, not a binary
+
+- Earlier framing was "macro = pixel, leaf = photoreal" — a binary. The cleaner model is *every surface carries some pixel character, with increasing detail as you zoom in*. Pixel is connective tissue, not a macro-only state.
+- **Macro canvas (`/`)** — full pixel art, whole world.
+- **Mid-zoom (`/equipment` overview)** — HD pixel art (Sea of Stars register). Each unit is a chunky-pixel portrait, but readable at desktop sizes.
+- **Leaf detail (`/equipment/[unit]`)** — pixel-art portrait of the unit at the top + photoreal/3D rotatable product shot of the actual hardware below + editorial spec data. Octopath HD-2D applied to product UI.
+- **Data-only surfaces (`/care`'s 30-day chart)** — chart lines stay smooth/readable, BUT the chart *frame* is bordered with 4px pixel-stepped chrome, section dividers are 8-bit, axis labels use sans paired with a small pixel-art accent icon.
+- **Chrome (TopNav, MobileTabBar)** — subtle pixel-art trim. Tab icons get an 8-bit active state. Navigation feels world-adjacent without becoming a costume.
+
+### Case studies (UI references — pixel + readable data hybrid)
+
+- **Octopath Traveler "HD-2D"** — canonical hybrid, 2D pixel sprites on 3D photoreal environments in the same frame. The "accurate HD-2D" framing from the dev team is basically our brief. https://www.unrealengine.com/en-US/spotlights/octopath-traveler-s-hd-2d-art-style-and-story-make-for-a-jrpg-dream-come-true
+- **Eastward (Pixpil)** — domestic, warm, painterly pixel art with legibly modern UI. Dialog boxes, item modals, inventory all cataloged on Game UI Database — almost a perfect match for the warm-domestic register we want. https://www.gameuidatabase.com/gameData.php?id=2131
+- **Sea of Stars (Sabotage Studio)** — modern HD pixel art with character portraits beside readable battle UI. The portraits-next-to-data-panels pattern is exactly the equipment-detail pattern we want. https://sabotagestudio.com/presskits/sea-of-stars/
+- **Pokemon GO** — real geo + game overlay at scale via S2 cells (Google's geometric abstraction for translating 3D Earth into 2D game-friendly geometry). Architecture template if we ever want a "pool map" feature. https://digitalcxo.com/article/pokemon-go-data-is-mapping-out-this-geospatial-system/
+
+### Local-page pixel-art generation as SEO moat
+
+The core idea: each city/market page (`/folks/palm-springs`, `/folks/scottsdale`, `/folks/san-diego`) gets its OWN AI-generated pixel-art landscape, with a city-specific palette extracted from real local imagery and applied as CSS variable overrides for that route.
+
+**Why this is a triple win:**
+- **Local SEO** — Google sees genuinely unique imagery + copy per city page. Combined with city-specific service language ("pool service in Palm Springs, where pH drifts up faster in 110°F summers..."), each page can rank organically in its market.
+- **Brand identity at scale** — pipeline generates 200+ unique city pages without per-page hand design.
+- **Onboarding flywheel** — when a homeowner signs up in Palm Springs, the city page is already styled like Palm Springs. The personal photo-to-world step then generates *their* pool inside the city's palette.
+
+**Pipeline (v2/v3 feature, but capture architecture now):**
+1. Curated reference set from Wikimedia Commons + Unsplash (permissive licensing — DO NOT scrape Google Images, legal/TOS risk) for ~50–100 markets.
+2. Image-gen prompt with lofi-pixel constraints + extracted dominant colors of the reference imagery.
+3. K-means cluster the result to extract 5–7 city-specific palette tokens.
+4. Tokens override `--color-surface`, `--color-cream`, etc. per route via `<html data-city="palm-springs">` on the relevant page.
+
+This pipeline is the same as the personal photo-to-world feature, just at city-scope instead of property-scope.
+
+### Path to dev handoff — Pencil is source of truth
+
+The visual moat thesis only pays off if every surface is designed at production fidelity in one consistent place. From here:
+
+- **`poolgo.pen` is the design spec.** All surfaces, all states. Production fidelity.
+- **`iterations.md` is the lab notebook.** Decisions, why's, abandoned directions, references.
+- **`DESIGN.md` is the locked direction.** Updated only when an iteration lands.
+- **TSX prototypes (`/canvas`, etc.) are research vehicles.** They validate interaction models. They get replaced when the design is locked and re-implemented from the Pencil spec.
+
+Implication for cadence: more time in Pencil designing the new register across all surfaces (backyard canvas, equipment portraits, chemistry data layer with pixel chrome, folks city pages) BEFORE writing more TSX. The canvas TSX is the proof-of-concept for the interaction; it's not the production artifact.
+
+### Open questions before promoting Iteration 4 to DESIGN.md
+
+1. **Sandy-warm tone — which exact value?** Stardew sun-bleached deck (`#D9C9A6`-ish, slight green shift), Spanish-tile terracotta (more saturated, more polarizing), or sandy yellow (warmer, risks toy)? Should mock all three on the same component as a comparison.
+2. **Chrome treatment.** Subtle pixel trim on TopNav/MobileTabBar (my instinct), or keep them clean? This is the call that decides whether the whole app feels world-adjacent or whether the world is contained on `/canvas`.
+3. **Typography pairing for data layer.** Inter Tight stays, OR pair Inter with a chunky pixel display face (like ChevyRay's pixel fonts) for headings/numerics? The latter is more committed but reads "game-y" in a way that may go too far.
+4. **Chart treatment.** Smooth lines + pixel chrome around the chart frame — but should the data POINTS be pixel-stepped (like Pokemon stat bars) or smooth dots? Stepped is more committed, smooth keeps clinical legibility.
+5. **3D product shots — fidelity bar at MVP.** Real interactive WebGL is non-trivial. The cheap-but-distinctive version is photoreal product photography with a hover-pan parallax (Apple-product-page energy). Real WebGL 3D comes later. Either way, the *contrast between pixel-macro and photoreal-detail* is what we're investing in.
+
+---
+
 ## How this file evolves
 
 - Each iteration appends a new section ("Iteration 3 — …", "Iteration 4 — …")
