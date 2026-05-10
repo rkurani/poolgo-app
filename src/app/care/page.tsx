@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Camera, Plus, Calendar, FlaskConical, Boxes } from "lucide-react";
+import { ArrowLeft, ArrowRight, Camera, Plus, Calendar } from "lucide-react";
 import { SectionHeader } from "@/components/SectionHeader";
+import { GarageSection } from "@/components/care/GarageSection";
 
 const VITALS = [
   { chem: "pH", value: "7.4", unit: "", target: "7.2–7.6", state: "in-range", source: "imported" },
@@ -90,140 +91,6 @@ const TESTS: Test[] = [
     when: "7 minutes ago",
     summary: "ORP 720 mV, stable",
     detail: "On-pad telemetry from the Pentair salt-cell flow loop. Refreshes every 90 seconds.",
-  },
-];
-
-type GarageItem = {
-  id: string;
-  name: string;
-  fits: string; // what equipment / chemistry need this serves
-  vendor: string;
-  vendorLogo: string | null;
-  brandTone: string;
-  brandSoft: string;
-  price: string;
-  stock: string;
-  stockTone: "live" | "soon";
-  kind: "chemical" | "part" | "test";
-};
-
-const GARAGE: GarageItem[] = [
-  {
-    id: "salt-40",
-    name: "Pool salt, 40 lb",
-    fits: "Tops up your Pentair IntelliChlor cell",
-    vendor: "Leslie's",
-    vendorLogo: "/assets/leslies.png",
-    brandTone: "var(--color-leslies, #0046A8)",
-    brandSoft: "var(--color-leslies-soft, #DEE8F7)",
-    price: "$14",
-    stock: "3 bags in stock, 2.1 mi",
-    stockTone: "live",
-    kind: "chemical",
-  },
-  {
-    id: "muriatic",
-    name: "Muriatic acid, 1 gal",
-    fits: "Drops pH when CYA partial drain pushes it up",
-    vendor: "Leslie's",
-    vendorLogo: "/assets/leslies.png",
-    brandTone: "var(--color-leslies, #0046A8)",
-    brandSoft: "var(--color-leslies-soft, #DEE8F7)",
-    price: "$11",
-    stock: "12 jugs in stock",
-    stockTone: "live",
-    kind: "chemical",
-  },
-  {
-    id: "cya",
-    name: "Cyanuric acid stabilizer, 4 lb",
-    fits: "Hold during partial drain. Drops CYA back to target.",
-    vendor: "Leslie's",
-    vendorLogo: "/assets/leslies.png",
-    brandTone: "var(--color-leslies, #0046A8)",
-    brandSoft: "var(--color-leslies-soft, #DEE8F7)",
-    price: "$28",
-    stock: "In stock",
-    stockTone: "live",
-    kind: "chemical",
-  },
-  {
-    id: "intelliflo-capacitor",
-    name: "IntelliFlo3 run capacitor",
-    fits: "Genuine Pentair replacement, fits your pump",
-    vendor: "Pentair",
-    vendorLogo: "/assets/pentair.jpg",
-    brandTone: "var(--color-pentair, #1A4F8B)",
-    brandSoft: "var(--color-pentair-soft, #E5ECF4)",
-    price: "$42",
-    stock: "Ships Mon, install Tue with Carlos",
-    stockTone: "soon",
-    kind: "part",
-  },
-  {
-    id: "intellichlor-flowswitch",
-    name: "IntelliChlor flow switch",
-    fits: "Replacement for IC40, 4yr maintenance",
-    vendor: "Pentair",
-    vendorLogo: "/assets/pentair.jpg",
-    brandTone: "var(--color-pentair, #1A4F8B)",
-    brandSoft: "var(--color-pentair-soft, #E5ECF4)",
-    price: "$112",
-    stock: "Backorder, 9 days",
-    stockTone: "soon",
-    kind: "part",
-  },
-  {
-    id: "hayward-sand",
-    name: "Hayward filter sand, 50 lb",
-    fits: "Rebed your sand filter every 4 to 5 years",
-    vendor: "Hayward",
-    vendorLogo: "/assets/hayward.png",
-    brandTone: "var(--color-hayward, #D8A700)",
-    brandSoft: "var(--color-hayward-soft, #FBF1D0)",
-    price: "$28",
-    stock: "In stock",
-    stockTone: "live",
-    kind: "part",
-  },
-  {
-    id: "polaris-brushes",
-    name: "Polaris replacement brushes",
-    fits: "Fits your 9650iQ robotic cleaner",
-    vendor: "Polaris",
-    vendorLogo: "/assets/polaris.png",
-    brandTone: "var(--color-polaris, #00759C)",
-    brandSoft: "var(--color-polaris-soft, #DCEDF4)",
-    price: "$34",
-    stock: "Ships Mon",
-    stockTone: "soon",
-    kind: "part",
-  },
-  {
-    id: "aquachek-strips",
-    name: "AquaChek 7-way test strips, 100 ct",
-    fits: "Daily check between Leslie's tests",
-    vendor: "Leslie's",
-    vendorLogo: "/assets/leslies.png",
-    brandTone: "var(--color-leslies, #0046A8)",
-    brandSoft: "var(--color-leslies-soft, #DEE8F7)",
-    price: "$18",
-    stock: "In stock",
-    stockTone: "live",
-    kind: "test",
-  },
-  {
-    id: "spintouch-reagents",
-    name: "LaMotte Spin Touch reagent kit",
-    fits: "Refill for your handheld photometer",
-    vendor: "LaMotte",
-    vendorLogo: null,
-    brandTone: "#B8252D",
-    brandSoft: "#F4DCDF",
-    price: "$48",
-    stock: "Ships Mon",
-    stockTone: "soon",
-    kind: "test",
   },
 ];
 
@@ -493,18 +360,7 @@ export default function CarePage() {
           </div>
         </section>
 
-        {/* Your garage at Leslie's — parts and chemistry curated to YOUR pad */}
-        <section className="flex flex-col gap-5">
-          <SectionHeader
-            title="Your garage at Leslie's."
-            caption="stocked for your pad, ready to add to Carlos's Tuesday visit"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {GARAGE.map((item) => (
-              <GarageItem key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
+        <GarageSection />
 
         {/* Next actions */}
         <section
@@ -674,109 +530,6 @@ function ConnectionChip({
   );
 }
 
-/**
- * GarageItem: a card for a stocked-at-Leslie's part or chemical curated to
- * this pool's equipment list. Frames the purchase as adding to the next pro
- * visit rather than a standalone checkout.
- */
-function GarageItem({ item }: { item: GarageItem }) {
-  const stockColor =
-    item.stockTone === "live"
-      ? "var(--color-source-live)"
-      : "var(--color-citrus, #E8A82C)";
-  const kindIcon =
-    item.kind === "chemical" ? FlaskConical : item.kind === "test" ? FlaskConical : Boxes;
-  const KindIcon = kindIcon;
-  return (
-    <div
-      className="group relative rounded-2xl border-2 p-5 flex flex-col gap-4 hover:translate-y-[-2px] transition-transform overflow-hidden"
-      style={{
-        backgroundColor: "var(--color-data-cream, #F1E6D3)",
-        borderColor: "var(--color-card-border, #B89B6A)",
-      }}
-    >
-      <span
-        className="absolute top-0 left-0 right-0 h-[5px]"
-        style={{ backgroundColor: item.brandTone }}
-        aria-hidden
-      />
-
-      <div className="flex items-start gap-3 mt-2">
-        <div
-          className="relative h-[56px] w-[56px] shrink-0 rounded-xl border overflow-hidden grid place-items-center"
-          style={{
-            borderColor: "var(--color-mountain-shadow, #5C5546)",
-            backgroundColor: item.brandSoft,
-            isolation: "isolate",
-          }}
-        >
-          {item.vendorLogo ? (
-            <div className="relative h-3/5 w-4/5">
-              <Image
-                src={item.vendorLogo}
-                alt={item.vendor}
-                fill
-                sizes="56px"
-                className="object-contain"
-                style={{ mixBlendMode: "multiply" }}
-              />
-            </div>
-          ) : (
-            <KindIcon size={22} strokeWidth={2.4}
-                      style={{ color: "var(--color-mountain-shadow, #5C5546)" }} />
-          )}
-        </div>
-        <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-          <span className="font-pixel text-[8px] uppercase tracking-[0.18em] truncate"
-                style={{ color: item.brandTone }}>
-            {item.vendor}
-          </span>
-          <span className="text-[15px] font-extrabold tracking-[-0.005em] leading-tight"
-                style={{ color: "var(--color-data-ink, #3B342A)" }}>
-            {item.name}
-          </span>
-          <span className="text-[11px] font-medium leading-tight mt-0.5"
-                style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
-            {item.fits}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[26px] font-extrabold tracking-[-0.02em]"
-              style={{
-                color: "var(--color-data-ink, #3B342A)",
-                fontFeatureSettings: '"tnum"',
-              }}>
-          {item.price}
-        </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em]"
-              style={{
-                backgroundColor: stockColor,
-                color: item.stockTone === "live" ? "white" : "var(--color-mountain-shadow, #5C5546)",
-              }}>
-          <span className="h-1.5 w-1.5 rounded-full"
-                style={{
-                  backgroundColor: item.stockTone === "live" ? "white" : "var(--color-mountain-shadow, #5C5546)",
-                }} />
-          {item.stock}
-        </span>
-      </div>
-
-      <button
-        className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-bold tracking-[-0.005em] border-2 hover:translate-y-[-1px] transition-transform"
-        style={{
-          backgroundColor: "var(--color-mountain-shadow, #5C5546)",
-          color: "white",
-          borderColor: "var(--color-mountain-shadow, #5C5546)",
-        }}
-      >
-        Add to Tuesday with Carlos
-        <ArrowRight size={14} strokeWidth={2.5} />
-      </button>
-    </div>
-  );
-}
 
 function LogoFrame({
   src,
