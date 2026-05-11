@@ -181,20 +181,48 @@ button { font-family: inherit; cursor: pointer; }
   to   { background-position: -256px 0; }
 }
 
-/* Lounger guest path. Lo-fi-girl pacing: he's invisible most of the time
-   (the bg figure represents him chilling on the lounger). Every full cycle
-   (~70s) he fades in, walks east along the patio, pauses, mirrors, walks
-   back, fades out. Translate values are in canvas pixels (2400x1500 stage). */
-@keyframes loungerGuestWalkPath {
-  0%, 38%   { transform: translateX(0) scaleX(1);     opacity: 0; }
-  40%       { transform: translateX(0) scaleX(1);     opacity: 1; }   /* fades in, faces east */
-  60%       { transform: translateX(520px) scaleX(1); opacity: 1; }   /* walked east */
-  63%       { transform: translateX(520px) scaleX(1); opacity: 1; }   /* paused, looks around */
-  66%       { transform: translateX(520px) scaleX(-1);opacity: 1; }   /* turned to face west */
-  86%       { transform: translateX(0) scaleX(-1);    opacity: 1; }   /* walked back */
-  89%       { transform: translateX(0) scaleX(-1);    opacity: 1; }   /* paused at home */
-  92%       { transform: translateX(0) scaleX(1);     opacity: 0; }   /* faces east + fades */
-  100%      { transform: translateX(0) scaleX(1);     opacity: 0; }   /* invisible until next cycle */
+/* Walking guest, three orthogonal animations on nested elements so each
+ * transform property stays clean and doesn't fight the others.
+ *
+ *   guestPath   (outer)  : translate in canvas pixels + opacity fade
+ *   guestDepth  (middle) : scale 2.4 → 2.6 → 2.4 (depth toward / away from camera)
+ *   guestFacing (inner)  : scaleX +1/-1 with step-end timing for instant flips
+ *
+ * The instant flip is achieved by setting animation-timing-function: step-end
+ * on the facing animation (not by trying to do a sub-1% transition inside the
+ * keyframe, which still interpolates through scaleX(0)).
+ *
+ * Isometric path math:
+ *   The macro is rendered at a roughly 15-20° low-top-down pitch. The patio
+ *   runs from the deck (left, mid-screen) toward the equipment pad (lower-right)
+ *   — walking east is walking slightly toward the camera. Translate angle is
+ *   ~atan(60/560) = ~6° below horizontal, modeling the patio's depth slope.
+ *   Scale ramps +8% across the east leg to model "closer to camera = bigger".
+ *
+ * 60-second loop. Invisible ~half the time so the world feels chill, fades
+ * smoothly so it doesn't blink. */
+@keyframes guestPath {
+  0%, 30% { transform: translate(0, 0);          opacity: 0; }
+  35%     { transform: translate(0, 0);          opacity: 1; }   /* faded in at start */
+  55%     { transform: translate(560px, 60px);   opacity: 1; }   /* walked east */
+  77%     { transform: translate(0, 0);          opacity: 1; }   /* walked back */
+  85%     { transform: translate(0, 0);          opacity: 0; }   /* faded out */
+  100%    { transform: translate(0, 0);          opacity: 0; }   /* invisible until next cycle */
+}
+
+@keyframes guestDepth {
+  0%, 35% { transform: scale(2.4); }
+  55%     { transform: scale(2.6); }   /* east end = slightly closer to camera */
+  77%     { transform: scale(2.4); }   /* back home */
+  100%    { transform: scale(2.4); }
+}
+
+@keyframes guestFacing {
+  0%, 57% { transform: scaleX(1); }    /* faces east on the eastward leg */
+  58%     { transform: scaleX(-1); }   /* instant flip via step-end timing */
+  78%     { transform: scaleX(-1); }   /* faces west on the westward leg */
+  79%     { transform: scaleX(1); }    /* flips back to face east before fade-out */
+  100%    { transform: scaleX(1); }
 }
 
 /* Per-city palette overrides — applied via data-city on a wrapper div.

@@ -64,32 +64,51 @@ export default function CanvasPage() {
             its own keyframe animation. Subtle, lofi-girl style. */}
         <AmbientLayer />
 
-        {/* Lounger guest, walking. 4-frame sprite sheet generated via
-            PixelLab animateWithText with the saved sitting master as
-            reference. low top-down camera view so the perspective matches
-            the isometric macro. Lo-fi pacing: invisible most of the time,
-            walks east once per ~70 seconds, mirrors on return. */}
+        {/* Guest walking. 4-frame sprite sheet generated via PixelLab's
+            animateWithText from a freshly-generated standing master (no
+            lounger association). low top-down camera view so the
+            perspective matches the macro's isometric angle.
+            Position: 34% / 56% — on the patio southeast of the lounger,
+            clearly not the bg figure stepping off the chair.
+
+            Three nested elements, three independent transform animations:
+              outer  → guestPath  (translate + opacity)
+              middle → guestDepth (scale 2.4 ↔ 2.6 for depth toward camera)
+              inner  → guestFacing (scaleX flip with step-end timing so
+                                    the sprite doesn't crush through 0)
+            Innermost div drives the 4-frame walk-cycle via background-position.
+            See globals.css for the isometric math. */}
         <div
           className="absolute z-[18] pointer-events-none"
           style={{
-            left: "23%",
-            top: "55%",
-            animation: "loungerGuestWalkPath 70s linear infinite",
+            left: "34%",
+            top: "56%",
+            transformOrigin: "left bottom",
+            animation: "guestPath 60s linear infinite",
           }}
           aria-hidden
         >
-          <div style={{ transform: "scale(1.8)", transformOrigin: "left bottom" }}>
+          <div style={{ transformOrigin: "left bottom", animation: "guestDepth 60s linear infinite" }}>
             <div
               style={{
                 width: 64,
                 height: 64,
-                backgroundImage: "url(/assets/canvas/sprites/lounger-guest-walkcycle.png)",
-                backgroundSize: "256px 64px",
-                backgroundRepeat: "no-repeat",
-                imageRendering: "pixelated",
-                animation: "walkCycle4 0.55s steps(4, start) infinite",
+                transformOrigin: "center bottom",
+                animation: "guestFacing 60s step-end infinite",
               }}
-            />
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  backgroundImage: "url(/assets/canvas/sprites/guest-walking.png)",
+                  backgroundSize: "256px 64px",
+                  backgroundRepeat: "no-repeat",
+                  imageRendering: "pixelated",
+                  animation: "walkCycle4 0.55s steps(4) infinite",
+                }}
+              />
+            </div>
           </div>
         </div>
 
