@@ -1,18 +1,20 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 /**
- * Canvas 3: the full layered world.
+ * Canvas 3: the layered breathing world, now with a click-to-place editor.
  *
- * The base scene has no plants baked in. Six independently-animatable layers
- * compose the breathing version: two palms swaying out of sync, an orange tree
- * with occasional fruit drop, bougainvillea cascading down the fence with
- * petals drifting in the breeze, pool water shimmer, distant chimney smoke,
- * pool floats bobbing.
+ * Visit /canvas-3?edit=1 to enter placement mode. Pick a layer from the panel,
+ * click on the canvas where you want it. Width and height are tuned by the
+ * arrow keys (← → for width, ↑ ↓ for height) while the layer is selected.
+ * Positions persist in localStorage so a refresh keeps your work. The "Copy"
+ * button on the panel emits a JSON snippet you can hand back to me to bake
+ * into the defaults.
  *
- * Plus inline SVG ambient: birds drifting, a duck bobbing on the pool, a green
- * chugging indicator above the pump.
- *
- * Lofi-girl tempo. Nothing demands attention, everything is alive.
+ * Out of edit mode the canvas is the production view: orbs, ambient SVG,
+ * layered animated PNGs.
  */
 
 type Status = "good" | "warn" | "info" | "human";
@@ -27,15 +29,27 @@ type Hotspot = {
   status: Status;
 };
 
+type LayerCfg = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
+type LayerId = "palmL" | "palmR" | "orange" | "bougain" | "smoke";
+
 const STAGE_W = 2400;
 const STAGE_H = 1500;
 
+// Positions tuned by eye against the base screenshot:
+// pickup truck on left of street, pool centered, equipment pad bottom-right,
+// lounger on the wooden deck at left-center, storefront top-right.
 const HOTSPOTS: Hotspot[] = [
-  { id: "pool",    x: 48, y: 60, label: "Today's water",                detail: "pH 7.4, ORP 720",      href: "/care",                  status: "good" },
-  { id: "pad",     x: 78, y: 76, label: "The pad",                     detail: "5 systems, all live",  href: "/equipment",             status: "good" },
-  { id: "lounger", x: 13, y: 60, label: "On the lounger",              detail: "Guest, 2:14pm",        href: "/care",                  status: "human" },
-  { id: "truck",   x: 62, y: 11, label: "Carlos, 4 mins up the street",detail: "Routes nearby",        href: "/folks/carlos-redlands", status: "human" },
-  { id: "shop",    x: 92, y: 14, label: "Leslie's, 2 mi",              detail: "In stock now",        href: "/folks",                  status: "info" },
+  { id: "pool",    x: 55, y: 70, label: "Today's water",                detail: "pH 7.4, ORP 720",      href: "/care",                  status: "good" },
+  { id: "pad",     x: 82, y: 90, label: "The pad",                     detail: "5 systems, all live",  href: "/equipment",             status: "good" },
+  { id: "lounger", x: 21, y: 52, label: "On the lounger",              detail: "Guest, 2:14pm",        href: "/care",                  status: "human" },
+  { id: "truck",   x: 14, y: 14, label: "Carlos, 4 mins up the street",detail: "Routes nearby",        href: "/folks/carlos-redlands", status: "human" },
+  { id: "shop",    x: 88, y: 13, label: "Leslie's, 2 mi",              detail: "In stock now",        href: "/folks",                  status: "info" },
 ];
 
 const STATUS_COLOR: Record<Status, string> = {
@@ -45,7 +59,118 @@ const STATUS_COLOR: Record<Status, string> = {
   human: "var(--color-source-human)",
 };
 
+// Defaults: my best guess after looking at the base. Fine-tune in edit mode.
+const DEFAULTS: Record<LayerId, LayerCfg> = {
+  palmL:   { x: -2, y: 38, w: 22, h: 58 },
+  palmR:   { x: 82, y: 18, w: 20, h: 50 },
+  orange:  { x: 78, y: 40, w: 14, h: 32 },
+  bougain: { x: 50, y: 22, w: 22, h: 14 },
+  smoke:   { x: 78, y: -8, w: 8,  h: 22 },
+};
+
+const LAYER_LABELS: Record<LayerId, string> = {
+  palmL:   "Palm, left",
+  palmR:   "Palm, right",
+  orange:  "Orange tree",
+  bougain: "Bougainvillea",
+  smoke:   "Chimney smoke",
+};
+
+const LAYER_IMG: Record<LayerId, string> = {
+  palmL:   "/assets/canvas/layers/palm.png",
+  palmR:   "/assets/canvas/layers/palm.png",
+  orange:  "/assets/canvas/layers/orange-tree.png",
+  bougain: "/assets/canvas/layers/bougainvillea-vine.png",
+  smoke:   "/assets/canvas/layers/smoke.png",
+};
+
+const STORAGE_KEY = "canvas3.layers.v1";
+
 export default function Canvas3Page() {
+  const [layers, setLayers] = useState<Record<LayerId, LayerCfg>>(DEFAULTS);
+  const [editing, setEditing] = useState(false);
+  const [selected, setSelected] = useState<LayerId | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("edit") === "1") setEditing(true);
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setLayers({ ...DEFAULTS, ...parsed });
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(layers));
+    } catch {}
+  }, [layers]);
+
+  useEffect(() => {
+    if (!editing || !selected) return;
+    function onKey(e: KeyboardEvent) {
+      const step = e.shiftKey ? 0.5 : 2;
+      let dW = 0, dH = 0;
+      if (e.key === "ArrowRight") dW = step;
+      else if (e.key === "ArrowLeft") dW = -step;
+      else if (e.key === "ArrowUp") dH = -step;
+      else if (e.key === "ArrowDown") dH = step;
+      else return;
+      e.preventDefault();
+      setLayers((prev) => {
+        if (!selected) return prev;
+        const cur = prev[selected];
+        return {
+          ...prev,
+          [selected]: {
+            ...cur,
+            w: Math.max(2, cur.w + dW),
+            h: Math.max(2, cur.h + dH),
+          },
+        };
+      });
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [editing, selected]);
+
+  function onStageClick(e: React.MouseEvent) {
+    if (!editing || !selected || !stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+    const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+    setLayers((prev) => {
+      const cur = prev[selected];
+      // place the center of the layer at the click point
+      return {
+        ...prev,
+        [selected]: {
+          ...cur,
+          x: xPct - cur.w / 2,
+          y: yPct - cur.h / 2,
+        },
+      };
+    });
+  }
+
+  function copyJSON() {
+    const out = JSON.stringify(layers, null, 2);
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(out);
+    }
+  }
+
+  function reset() {
+    setLayers(DEFAULTS);
+    setSelected(null);
+  }
+
   return (
     <div
       data-city="redlands"
@@ -55,8 +180,17 @@ export default function Canvas3Page() {
         scrollBehavior: "smooth",
       }}
     >
-      <div className="relative shrink-0" style={{ width: STAGE_W, height: STAGE_H }}>
-        {/* z-10 — base layer, scene with no plants baked in */}
+      <div
+        ref={stageRef}
+        onClick={onStageClick}
+        className="relative shrink-0"
+        style={{
+          width: STAGE_W,
+          height: STAGE_H,
+          cursor: editing && selected ? "crosshair" : "default",
+        }}
+      >
+        {/* z-10 — base layer, clean of any plants */}
         <div
           className="absolute inset-0 z-10 bg-no-repeat bg-cover bg-center"
           style={{
@@ -66,100 +200,64 @@ export default function Canvas3Page() {
           aria-hidden
         />
 
-        {/* z-15 — pool water sparkles, inline SVG twinkles scattered on the pool */}
+        {/* z-15 — pool water sparkles */}
         <PoolSparkles />
 
-        {/* z-18 — chimney smoke from a distant house */}
-        <div
-          className="absolute z-[18] pointer-events-none"
-          style={{
-            left: "78%",
-            top: "0%",
-            width: "8%",
-            height: "22%",
-            animation: "smokeRise 8s linear infinite",
-            transformOrigin: "bottom center",
-          }}
-          aria-hidden
-        >
-          <div
-            className="h-full w-full bg-no-repeat bg-contain bg-bottom"
-            style={{
-              backgroundImage: "url(/assets/canvas/layers/smoke.png)",
-              imageRendering: "pixelated",
-              opacity: 0.85,
-            }}
-          />
-        </div>
+        {/* z-18 — chimney smoke */}
+        <PlacedLayer
+          id="smoke"
+          cfg={layers.smoke}
+          editing={editing}
+          selected={selected === "smoke"}
+          onSelect={() => setSelected("smoke")}
+          animation={editing ? "none" : "smokeRise 8s linear infinite"}
+          imgSrc={LAYER_IMG.smoke}
+          imgOpacity={0.85}
+          imgPosition="bottom"
+        />
 
-        {/* z-20 — palm fronds, left side, swaying */}
-        <div
-          className="absolute z-20"
-          style={{
-            left: "-2%",
-            top: "0%",
-            width: "22%",
-            height: "70%",
-            animation: "palmSwayL 7s ease-in-out infinite",
-            transformOrigin: "50% 95%",
-          }}
-          aria-hidden
-        >
-          <div
-            className="h-full w-full bg-no-repeat bg-contain bg-bottom"
-            style={{
-              backgroundImage: "url(/assets/canvas/layers/palm.png)",
-              imageRendering: "pixelated",
-            }}
-          />
-        </div>
+        {/* z-20 — palm fronds, left */}
+        <PlacedLayer
+          id="palmL"
+          cfg={layers.palmL}
+          editing={editing}
+          selected={selected === "palmL"}
+          onSelect={() => setSelected("palmL")}
+          animation={editing ? "none" : "palmSwayL 7s ease-in-out infinite"}
+          transformOrigin="50% 95%"
+          imgSrc={LAYER_IMG.palmL}
+          imgPosition="bottom"
+        />
 
-        {/* z-20 — palm fronds, right side */}
-        <div
-          className="absolute z-20"
-          style={{
-            right: "-1%",
-            top: "20%",
-            width: "20%",
-            height: "60%",
-            animation: "palmSwayR 8.5s ease-in-out infinite",
-            transformOrigin: "50% 95%",
-            animationDelay: "1.4s",
-          }}
-          aria-hidden
-        >
-          <div
-            className="h-full w-full bg-no-repeat bg-contain bg-bottom"
-            style={{
-              backgroundImage: "url(/assets/canvas/layers/palm.png)",
-              imageRendering: "pixelated",
-              transform: "scaleX(-1)",
-            }}
-          />
-        </div>
+        {/* z-20 — palm fronds, right (flipped) */}
+        <PlacedLayer
+          id="palmR"
+          cfg={layers.palmR}
+          editing={editing}
+          selected={selected === "palmR"}
+          onSelect={() => setSelected("palmR")}
+          animation={editing ? "none" : "palmSwayR 8.5s ease-in-out infinite"}
+          animationDelay="1.4s"
+          transformOrigin="50% 95%"
+          imgSrc={LAYER_IMG.palmR}
+          imgPosition="bottom"
+          imgScaleX={-1}
+        />
 
-        {/* z-22 — orange tree, sits between pool and equipment pad (clear of lounger) */}
-        <div
-          className="absolute z-[22]"
-          style={{
-            left: "64%",
-            top: "22%",
-            width: "13%",
-            height: "48%",
-            animation: "treeSway 6s ease-in-out infinite",
-            transformOrigin: "50% 95%",
-            animationDelay: "0.7s",
-          }}
-          aria-hidden
+        {/* z-22 — orange tree */}
+        <PlacedLayer
+          id="orange"
+          cfg={layers.orange}
+          editing={editing}
+          selected={selected === "orange"}
+          onSelect={() => setSelected("orange")}
+          animation={editing ? "none" : "treeSway 6s ease-in-out infinite"}
+          animationDelay="0.7s"
+          transformOrigin="50% 95%"
+          imgSrc={LAYER_IMG.orange}
+          imgPosition="bottom"
+          zIndex={22}
         >
-          <div
-            className="h-full w-full bg-no-repeat bg-contain bg-bottom"
-            style={{
-              backgroundImage: "url(/assets/canvas/layers/orange-tree.png)",
-              imageRendering: "pixelated",
-            }}
-          />
-          {/* an occasional orange dropping */}
           <span
             className="absolute"
             style={{
@@ -169,38 +267,29 @@ export default function Canvas3Page() {
               height: 10,
               borderRadius: 2,
               backgroundColor: "#E8761A",
-              animation: "fruitDrop 22s ease-in 8s infinite",
+              animation: editing ? "none" : "fruitDrop 22s ease-in 8s infinite",
               opacity: 0,
             }}
             aria-hidden
           />
-        </div>
+        </PlacedLayer>
 
-        {/* z-21 — bougainvillea vine cascading over the back fence (anchored above
-            the existing fence in the base, no second fence rendered) */}
-        <div
-          className="absolute z-[21]"
-          style={{
-            left: "42%",
-            top: "8%",
-            width: "22%",
-            height: "18%",
-            animation: "bougainSway 9s ease-in-out infinite",
-            transformOrigin: "50% 100%",
-          }}
-          aria-hidden
-        >
-          <div
-            className="h-full w-full bg-no-repeat bg-contain bg-top"
-            style={{
-              backgroundImage: "url(/assets/canvas/layers/bougainvillea-vine.png)",
-              imageRendering: "pixelated",
-            }}
-          />
-        </div>
+        {/* z-21 — bougainvillea vine */}
+        <PlacedLayer
+          id="bougain"
+          cfg={layers.bougain}
+          editing={editing}
+          selected={selected === "bougain"}
+          onSelect={() => setSelected("bougain")}
+          animation={editing ? "none" : "bougainSway 9s ease-in-out infinite"}
+          transformOrigin="50% 100%"
+          imgSrc={LAYER_IMG.bougain}
+          imgPosition="top"
+          zIndex={21}
+        />
 
-        {/* z-23 — bougainvillea petals drifting on the breeze */}
-        <PetalField />
+        {/* z-23 — bougainvillea petals */}
+        {!editing && <PetalField left={layers.bougain.x} width={layers.bougain.w} top={layers.bougain.y + layers.bougain.h} />}
 
         {/* z-25 — Redlands watermark */}
         <div
@@ -225,51 +314,218 @@ export default function Canvas3Page() {
           </div>
         </div>
 
-        {/* z-30 — hot-spot orbs */}
-        {HOTSPOTS.map((spot) => (
-          <HotspotOrb key={spot.id} spot={spot} />
-        ))}
+        {/* z-30 — hot-spot orbs (disabled in edit mode so they don't intercept clicks) */}
+        {!editing && HOTSPOTS.map((spot) => <HotspotOrb key={spot.id} spot={spot} />)}
       </div>
 
-      <div className="pointer-events-none fixed top-4 right-4 z-30 flex flex-col items-end gap-2">
+      {/* Header chrome */}
+      <div className="pointer-events-none fixed top-4 right-4 z-40 flex flex-col items-end gap-2">
         <span
           className="rounded-full backdrop-blur-sm text-white text-[10px] uppercase tracking-[0.12em] font-bold px-3 py-1.5"
           style={{ backgroundColor: "var(--color-mountain-shadow, #5C5546)" }}
         >
-          Canvas 3 · the breathing world
+          {editing ? "Canvas 3 · placement mode" : "Canvas 3 · the breathing world"}
         </span>
-        <Link
-          href="/canvas"
-          className="rounded-full bg-white/85 backdrop-blur-sm text-[10px] uppercase tracking-[0.12em] font-bold px-3 py-1.5 pointer-events-auto"
+        <button
+          type="button"
+          onClick={() => setEditing((e) => !e)}
+          className="rounded-full bg-white/85 backdrop-blur-sm text-[10px] uppercase tracking-[0.12em] font-bold px-3 py-1.5 pointer-events-auto cursor-pointer"
           style={{ color: "var(--color-mountain-shadow, #5C5546)" }}
         >
-          ← original canvas
-        </Link>
+          {editing ? "Done placing →" : "Place layers ⊕"}
+        </button>
+        {!editing && (
+          <Link
+            href="/canvas"
+            className="rounded-full bg-white/85 backdrop-blur-sm text-[10px] uppercase tracking-[0.12em] font-bold px-3 py-1.5 pointer-events-auto"
+            style={{ color: "var(--color-mountain-shadow, #5C5546)" }}
+          >
+            ← original canvas
+          </Link>
+        )}
       </div>
+
+      {/* Placement panel */}
+      {editing && (
+        <div
+          className="fixed bottom-4 left-4 right-4 sm:right-auto sm:max-w-[360px] z-40 rounded-2xl border-[3px] p-4 shadow-[6px_6px_0_0_rgba(59,52,42,0.35)]"
+          style={{
+            backgroundColor: "var(--color-data-cream, #F1E6D3)",
+            borderColor: "var(--color-mountain-shadow, #5C5546)",
+          }}
+        >
+          <div className="flex flex-col gap-3">
+            <div className="flex items-baseline justify-between">
+              <span
+                className="font-pixel text-[10px] uppercase tracking-[0.18em]"
+                style={{ color: "var(--color-mountain-shadow, #5C5546)" }}
+              >
+                Placement panel
+              </span>
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.08em]"
+                style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
+              >
+                Click stage to place, arrows resize
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-1.5">
+              {(Object.keys(layers) as LayerId[]).map((id) => {
+                const cfg = layers[id];
+                const isSel = selected === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setSelected(isSel ? null : id)}
+                    className="flex items-center justify-between gap-2 rounded-md border-2 px-3 py-2 text-left transition-transform"
+                    style={{
+                      backgroundColor: isSel ? "var(--color-mountain-shadow, #5C5546)" : "transparent",
+                      borderColor: "var(--color-mountain-shadow, #5C5546)",
+                      color: isSel ? "white" : "var(--color-data-ink, #3B342A)",
+                    }}
+                  >
+                    <span className="text-[12px] font-bold">{LAYER_LABELS[id]}</span>
+                    <span
+                      className="font-pixel text-[9px] tracking-[0.06em]"
+                      style={{ opacity: 0.75 }}
+                    >
+                      x{cfg.x.toFixed(1)} y{cfg.y.toFixed(1)} {cfg.w.toFixed(0)}×{cfg.h.toFixed(0)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={copyJSON}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-[11px] font-bold uppercase tracking-[0.08em]"
+                style={{
+                  backgroundColor: "var(--color-terracotta, #C75240)",
+                  color: "white",
+                }}
+              >
+                Copy JSON
+              </button>
+              <button
+                type="button"
+                onClick={reset}
+                className="inline-flex items-center justify-center rounded-md px-3 py-2 text-[11px] font-bold uppercase tracking-[0.08em] border-2"
+                style={{
+                  borderColor: "var(--color-mountain-shadow, #5C5546)",
+                  color: "var(--color-data-ink, #3B342A)",
+                }}
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-/**
- * PoolSparkles: scattered chunky white pixels on the pool surface that
- * twinkle in and out on their own timers. Replaces the rectangular shimmer
- * overlay which read as a tiled box rather than ambient sparkle.
- */
+function PlacedLayer({
+  id,
+  cfg,
+  editing,
+  selected,
+  onSelect,
+  animation,
+  animationDelay,
+  transformOrigin,
+  imgSrc,
+  imgOpacity,
+  imgPosition,
+  imgScaleX,
+  zIndex,
+  children,
+}: {
+  id: LayerId;
+  cfg: LayerCfg;
+  editing: boolean;
+  selected: boolean;
+  onSelect: () => void;
+  animation: string;
+  animationDelay?: string;
+  transformOrigin?: string;
+  imgSrc: string;
+  imgOpacity?: number;
+  imgPosition?: "top" | "bottom" | "center";
+  imgScaleX?: number;
+  zIndex?: number;
+  children?: React.ReactNode;
+}) {
+  const bgPos = imgPosition === "top" ? "top" : imgPosition === "center" ? "center" : "bottom";
+  return (
+    <div
+      className="absolute"
+      style={{
+        left: `${cfg.x}%`,
+        top: `${cfg.y}%`,
+        width: `${cfg.w}%`,
+        height: `${cfg.h}%`,
+        zIndex: zIndex || 20,
+        animation,
+        animationDelay,
+        transformOrigin,
+        outline: editing ? (selected ? "3px dashed #C75240" : "1px dashed rgba(60,40,30,0.5)") : "none",
+        boxShadow: selected ? "0 0 0 3px rgba(199,82,64,0.3)" : "none",
+        cursor: editing ? "pointer" : "default",
+      }}
+      onClick={(e) => {
+        if (editing) {
+          e.stopPropagation();
+          onSelect();
+        }
+      }}
+      aria-hidden
+    >
+      <div
+        className="h-full w-full bg-no-repeat bg-contain pointer-events-none"
+        style={{
+          backgroundImage: `url(${imgSrc})`,
+          backgroundPosition: bgPos,
+          imageRendering: "pixelated",
+          opacity: imgOpacity ?? 1,
+          transform: imgScaleX ? `scaleX(${imgScaleX})` : undefined,
+        }}
+      />
+      {children}
+      {editing && (
+        <span
+          className="absolute -top-7 left-0 px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.08em] pointer-events-none"
+          style={{
+            backgroundColor: selected ? "var(--color-terracotta, #C75240)" : "var(--color-mountain-shadow, #5C5546)",
+            color: "white",
+          }}
+        >
+          {LAYER_LABELS[id]}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function PoolSparkles() {
-  // Pool zone approx x: 32-66%, y: 56-78%
+  // Pool zone approx x: 35-78%, y: 56-86% (centered on the visible pool).
   const sparkles = [
-    { x: 36, y: 62, delay: 0.0, dur: 3.6 },
-    { x: 41, y: 68, delay: 1.4, dur: 4.2 },
-    { x: 47, y: 60, delay: 0.7, dur: 3.0 },
-    { x: 52, y: 71, delay: 2.1, dur: 4.5 },
-    { x: 56, y: 65, delay: 1.0, dur: 3.4 },
-    { x: 60, y: 73, delay: 2.8, dur: 4.0 },
-    { x: 44, y: 75, delay: 0.4, dur: 3.8 },
-    { x: 50, y: 58, delay: 1.7, dur: 3.2 },
-    { x: 38, y: 70, delay: 2.4, dur: 4.4 },
-    { x: 58, y: 60, delay: 0.9, dur: 3.7 },
-    { x: 54, y: 64, delay: 1.6, dur: 4.1 },
-    { x: 42, y: 72, delay: 2.3, dur: 3.5 },
+    { x: 40, y: 64, delay: 0.0, dur: 3.6 },
+    { x: 45, y: 70, delay: 1.4, dur: 4.2 },
+    { x: 50, y: 60, delay: 0.7, dur: 3.0 },
+    { x: 55, y: 72, delay: 2.1, dur: 4.5 },
+    { x: 60, y: 67, delay: 1.0, dur: 3.4 },
+    { x: 65, y: 75, delay: 2.8, dur: 4.0 },
+    { x: 48, y: 78, delay: 0.4, dur: 3.8 },
+    { x: 53, y: 63, delay: 1.7, dur: 3.2 },
+    { x: 42, y: 73, delay: 2.4, dur: 4.4 },
+    { x: 62, y: 62, delay: 0.9, dur: 3.7 },
+    { x: 58, y: 67, delay: 1.6, dur: 4.1 },
+    { x: 46, y: 75, delay: 2.3, dur: 3.5 },
   ];
   return (
     <div className="absolute inset-0 z-[15] pointer-events-none" aria-hidden>
@@ -293,12 +549,9 @@ function PoolSparkles() {
   );
 }
 
-function PetalField() {
-  // 12 bougainvillea petals drifting down on slightly different paths/timings.
-  // Each petal is an inline SVG rect cluster (~6x4px chunky pixel petal), CSS
-  // animates translateY + translateX wobble + rotation + opacity fade.
+function PetalField({ left, width, top }: { left: number; width: number; top: number }) {
   const petals = Array.from({ length: 12 }, (_, i) => ({
-    left: 45 + (i * 2.4) % 28, // spread along the fence width
+    left: left + (i * (width / 12)),
     delay: (i * 1.7) % 18,
     duration: 14 + ((i * 1.3) % 8),
     color: i % 3 === 0 ? "#C75240" : i % 3 === 1 ? "#D4248A" : "#E8528A",
@@ -312,7 +565,7 @@ function PetalField() {
           className="absolute"
           style={{
             left: `${p.left}%`,
-            top: "20%",
+            top: `${top}%`,
             width: 6,
             height: 4,
             backgroundColor: p.color,
