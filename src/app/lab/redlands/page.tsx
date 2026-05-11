@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Sparkles, Download, Wand2, Loader2, RefreshCw, Check, ChevronLeft, Eye } from "lucide-react";
+import { Sparkles, Download, Wand2, Loader2, RefreshCw, Check, ChevronLeft, Eye, Footprints } from "lucide-react";
 import { REDLANDS_LIBRARY, masterPrompt, variantPrompt, type LibraryEntry, type LibraryCategory } from "@/lib/lab/redlands-library";
 
 type CardState = {
@@ -12,6 +12,11 @@ type CardState = {
   savedPath?: string;
   savedAt?: number;
   error?: string;
+  // walk-cycle state (only relevant for master characters)
+  walkStatus?: "idle" | "generating" | "preview" | "saved" | "error";
+  walkFrames?: string[];
+  walkSheetPath?: string;
+  walkError?: string;
 };
 
 const CATEGORY_LABELS: Record<LibraryCategory, string> = {
@@ -97,6 +102,78 @@ export default function RedlandsLibraryPage() {
       setStates((prev) => ({
         ...prev,
         [entry.id]: { status: "error", error: e instanceof Error ? e.message : "unknown" },
+      }));
+    }
+  }
+
+  async function animateOne(entry: LibraryEntry) {
+    const cur = states[entry.id];
+    if (cur?.status !== "saved") return; // need master saved first
+    setStates((prev) => ({
+      ...prev,
+      [entry.id]: { ...prev[entry.id], walkStatus: "generating", walkError: undefined },
+    }));
+    try {
+      const res = await fetch("/api/lab/animate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: entry.subject,
+          action: "walking right, mid-stride with arms moving",
+          referenceFileId: entry.id,
+          size: entry.size,
+          nFrames: 4,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Animation failed");
+      setStates((prev) => ({
+        ...prev,
+        [entry.id]: { ...prev[entry.id], walkStatus: "preview", walkFrames: data.frames },
+      }));
+    } catch (e) {
+      setStates((prev) => ({
+        ...prev,
+        [entry.id]: {
+          ...prev[entry.id],
+          walkStatus: "error",
+          walkError: e instanceof Error ? e.message : "unknown",
+        },
+      }));
+    }
+  }
+
+  async function saveWalkcycle(entry: LibraryEntry) {
+    const cur = states[entry.id];
+    if (!cur?.walkFrames || cur.walkFrames.length < 2) return;
+    try {
+      const res = await fetch("/api/lab/save-spritesheet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          frames: cur.walkFrames,
+          name: `${entry.id}-walkcycle`,
+          frameSize: entry.size,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Save failed");
+      setStates((prev) => ({
+        ...prev,
+        [entry.id]: {
+          ...prev[entry.id],
+          walkStatus: "saved",
+          walkSheetPath: `${data.path}?t=${Date.now()}`,
+        },
+      }));
+    } catch (e) {
+      setStates((prev) => ({
+        ...prev,
+        [entry.id]: {
+          ...prev[entry.id],
+          walkStatus: "error",
+          walkError: e instanceof Error ? e.message : "save failed",
+        },
       }));
     }
   }
@@ -241,6 +318,8 @@ export default function RedlandsLibraryPage() {
                   onGenerate={() => generateOne(entry)}
                   onSave={() => saveOne(entry)}
                   onRegenerate={() => generateOne(entry)}
+                  onAnimate={() => animateOne(entry)}
+                  onSaveWalkcycle={() => saveWalkcycle(entry)}
                 />
               ))}
             </div>
@@ -258,6 +337,8 @@ function SpriteCard({
   onGenerate,
   onSave,
   onRegenerate,
+  onAnimate,
+  onSaveWalkcycle,
 }: {
   entry: LibraryEntry;
   state: CardState;
@@ -265,8 +346,12 @@ function SpriteCard({
   onGenerate: () => void;
   onSave: () => void;
   onRegenerate: () => void;
+  onAnimate: () => void;
+  onSaveWalkcycle: () => void;
 }) {
   const blocked = entry.kind === "variant" && !masterReady;
+  // Animate is only meaningful for masters that are saved and are characters
+  const canAnimate = entry.category === "character" && entry.kind === "master" && state.status === "saved";
   return (
     <div
       className="relative rounded-2xl border-2 p-4 flex flex-col gap-3 overflow-hidden"
@@ -479,6 +564,133 @@ function SpriteCard({
           )}
         </div>
       </div>
+
+      {canAnimate && (
+        <div
+          className="flex flex-col gap-2 pt-3 mt-1 border-t-2"
+          style={{ borderColor: "var(--color-card-border, #B89B6A)" }}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span
+              className="font-pixel text-[9px] uppercase tracking-[0.14em]"
+              style={{ color: "var(--color-mountain-shadow, #5C5546)" }}
+            >
+              Walk cycle
+            </span>
+            {(!state.walkStatus || state.walkStatus === "idle") && (
+              <button
+                type="button"
+                onClick={onAnimate}
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] border-2"
+                style={{
+                  borderColor: "var(--color-mountain-shadow, #5C5546)",
+                  color: "var(--color-data-ink, #3B342A)",
+                  backgroundColor: "transparent",
+                }}
+              >
+                <Footprints size={11} strokeWidth={2.5} />
+                Animate
+              </button>
+            )}
+            {state.walkStatus === "generating" && (
+              <span
+                className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.08em]"
+                style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
+              >
+                <Loader2 size={11} strokeWidth={2.5} className="animate-spin" />
+                4 frames…
+              </span>
+            )}
+            {state.walkStatus === "preview" && (
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={onAnimate}
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] border-2"
+                  style={{ borderColor: "var(--color-mountain-shadow, #5C5546)", color: "var(--color-data-ink, #3B342A)" }}
+                  title="Regenerate walk cycle"
+                >
+                  <RefreshCw size={11} strokeWidth={2.5} />
+                </button>
+                <button
+                  type="button"
+                  onClick={onSaveWalkcycle}
+                  className="inline-flex items-center gap-1 rounded-md px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em]"
+                  style={{ backgroundColor: "var(--color-terracotta, #C75240)", color: "white" }}
+                >
+                  <Download size={11} strokeWidth={2.5} />
+                  Save sheet
+                </button>
+              </div>
+            )}
+            {state.walkStatus === "saved" && (
+              <span
+                className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.08em]"
+                style={{ color: "var(--color-source-live)" }}
+              >
+                <Check size={11} strokeWidth={3} />
+                Saved
+              </span>
+            )}
+          </div>
+
+          {state.walkFrames && state.walkFrames.length > 0 && (
+            <div
+              className="flex gap-1.5 p-2 rounded-lg overflow-x-auto"
+              style={{ backgroundColor: "rgba(255,255,255,0.5)" }}
+            >
+              {state.walkFrames.map((url, i) => (
+                <div
+                  key={i}
+                  className="relative shrink-0 rounded-md border bg-white"
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderColor: "var(--color-mountain-shadow, #5C5546)",
+                  }}
+                >
+                  <Image
+                    src={url}
+                    alt={`frame ${i}`}
+                    fill
+                    sizes="56px"
+                    className="object-contain"
+                    style={{ imageRendering: "pixelated" }}
+                    unoptimized
+                  />
+                  <span
+                    className="absolute -top-1 -left-1 font-pixel text-[8px] tracking-wider px-1 rounded bg-mountain-shadow"
+                    style={{
+                      backgroundColor: "var(--color-mountain-shadow, #5C5546)",
+                      color: "white",
+                    }}
+                  >
+                    {i}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {state.walkStatus === "saved" && state.walkSheetPath && (
+            <a
+              href={state.walkSheetPath}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-pixel text-[8px] tracking-[0.12em] underline-offset-2 hover:underline"
+              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
+            >
+              {entry.id}-walkcycle.png
+            </a>
+          )}
+
+          {state.walkStatus === "error" && state.walkError && (
+            <span className="text-[10px] font-semibold leading-tight" style={{ color: "#B8252D" }}>
+              {state.walkError}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
