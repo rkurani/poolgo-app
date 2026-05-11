@@ -307,6 +307,50 @@ Implication for cadence: more time in Pencil designing the new register across a
 
 ---
 
+## Iteration 5 — Layered canvas, breathing world
+
+The macro canvas was always a single flat PNG. Lovely image, but every animation we tried bled around the edges because there were no parts to move. Maya as a hand-coded SVG looked nothing like the world. Birds and walkers floated through the sky because we had no foreground/background separation. Time to layer it.
+
+### Storyline anchor — Redlands, late afternoon, working
+
+The canvas is the porch you sit on while everything quietly works. Golden-hour Redlands. The IntelliFlo3 is on stage B, you can almost hear it. Carlos was here Tuesday, his truck is parked one lot away hitting the next house. A breeze is up — palms catch, orange-tree leaves shift, a single bougainvillea petal drifts down the cedar fence. The figure on the lounger is enjoying it. Tomorrow's Leslie's test already imported. Everything is fine.
+
+Lofi-girl tempo. The canvas doesn't demand attention. Status orbs sit quietly; the world hums around them.
+
+### Plant set — accurate to Redlands
+
+The historic navel-orange capital of the world (16 city-owned groves on 184 acres still standing). The canonical SoCal/Redlands backyard plant kit is:
+
+- **Navel orange tree** (not just lemon, oranges are the heritage)
+- **Mexican fan palms** (left and right of property)
+- **San Diego Red bougainvillea** climbing the cedar fence (vibrant magenta, drought-tolerant, drops petals)
+- Distant **San Gorgonio mountains** with snow caps on the eastern skyline (already in bg)
+
+We're keeping the rest of the world as-is (deck, pool, equipment pad, truck, storefront), but pulling these plants out as separable PNG layers so each can move independently.
+
+### Six moving layers
+
+1. **Palms left + right** (existing pipeline) — sway breeze, independent loops
+2. **Navel orange tree** — leaf sway, occasional fruit-drop on a 20–40s timer
+3. **Bougainvillea on the fence** — base image plus particle layer of petals drifting down on the breeze
+4. **Pool water shimmer** — cyan ripple overlay, gentle horizontal pulse, low-opacity
+5. **Distant chimney smoke** — wispy gray column rising over a house in the distance, dissipates
+6. **Pool floats** — separable so they bob on the water surface independently
+
+Plus already-working SVG ambient: birds drifting across sky, duck bobbing, pump-chug indicator.
+
+### Asset pipeline (proven by Canvas 2)
+
+- Pencil generates each layer on a solid magenta (#FF00FF) background
+- PIL chroma-key in Bash replaces magenta with transparent, preserves full pixel saturation (better than rembg for AI-generated subjects)
+- Layers composited as absolutely-positioned PNGs over the base
+- CSS keyframes drive per-layer motion: rotate for sway, scale + opacity for shimmer, translateY + fade for smoke
+- Particles (bougainvillea petals) are inline SVG with CSS keyframe drift animations
+
+### Promotion path
+
+Build first as `/canvas-3`. When the storyline lands, promote `/canvas-3` → `/canvas` and retire `/canvas-2` (the layer-test scaffold).
+
 ## How this file evolves
 
 - Each iteration appends a new section ("Iteration 3 — …", "Iteration 4 — …")
