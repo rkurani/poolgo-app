@@ -66,9 +66,10 @@ export async function POST(req: Request) {
       image_size: { width: size, height: size },
       description,
       action,
-      view: body.view || "side",
+      view: body.view || "low top-down",
       direction: body.direction || "east",
       n_frames: nFrames,
+      no_background: true,
       reference_image: { type: "base64", base64: referenceBase64, format: "png" },
     };
 

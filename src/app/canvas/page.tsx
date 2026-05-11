@@ -64,21 +64,21 @@ export default function CanvasPage() {
             its own keyframe animation. Subtle, lofi-girl style. */}
         <AmbientLayer />
 
-        {/* Lounger guest, walking. A 4-frame sprite sheet generated via
-            PixelLab animateWithText with the saved sitting master as the
-            reference image (identity preserved). He walks east along the
-            deck, pauses, mirrors on the return, and pauses again before
-            looping. On a 28-second cycle. */}
+        {/* Lounger guest, walking. 4-frame sprite sheet generated via
+            PixelLab animateWithText with the saved sitting master as
+            reference. low top-down camera view so the perspective matches
+            the isometric macro. Lo-fi pacing: invisible most of the time,
+            walks east once per ~70 seconds, mirrors on return. */}
         <div
           className="absolute z-[18] pointer-events-none"
           style={{
-            left: "21%",
-            top: "44%",
-            animation: "loungerGuestWalkPath 28s ease-in-out infinite",
+            left: "23%",
+            top: "55%",
+            animation: "loungerGuestWalkPath 70s linear infinite",
           }}
           aria-hidden
         >
-          <div style={{ transform: "scale(1.6)", transformOrigin: "left bottom" }}>
+          <div style={{ transform: "scale(1.8)", transformOrigin: "left bottom" }}>
             <div
               style={{
                 width: 64,

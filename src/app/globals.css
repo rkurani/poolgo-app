@@ -181,18 +181,20 @@ button { font-family: inherit; cursor: pointer; }
   to   { background-position: -256px 0; }
 }
 
-/* Path for the lounger guest: walks right along the deck, pauses, turns,
-   walks back, pauses, turns to face forward. Translate values are in canvas
-   pixels (the canvas is the 2400x1500 stage). 28-second loop. */
+/* Lounger guest path. Lo-fi-girl pacing: he's invisible most of the time
+   (the bg figure represents him chilling on the lounger). Every full cycle
+   (~70s) he fades in, walks east along the patio, pauses, mirrors, walks
+   back, fades out. Translate values are in canvas pixels (2400x1500 stage). */
 @keyframes loungerGuestWalkPath {
-  0%   { transform: translateX(0) scaleX(1); }
-  32%  { transform: translateX(560px) scaleX(1); }   /* walked right */
-  37%  { transform: translateX(560px) scaleX(1); }   /* pause at destination */
-  41%  { transform: translateX(560px) scaleX(-1); }  /* turn around */
-  73%  { transform: translateX(0) scaleX(-1); }      /* walked back */
-  78%  { transform: translateX(0) scaleX(-1); }      /* pause at home */
-  82%  { transform: translateX(0) scaleX(1); }       /* turn to face forward */
-  100% { transform: translateX(0) scaleX(1); }       /* rest before next loop */
+  0%, 38%   { transform: translateX(0) scaleX(1);     opacity: 0; }
+  40%       { transform: translateX(0) scaleX(1);     opacity: 1; }   /* fades in, faces east */
+  60%       { transform: translateX(520px) scaleX(1); opacity: 1; }   /* walked east */
+  63%       { transform: translateX(520px) scaleX(1); opacity: 1; }   /* paused, looks around */
+  66%       { transform: translateX(520px) scaleX(-1);opacity: 1; }   /* turned to face west */
+  86%       { transform: translateX(0) scaleX(-1);    opacity: 1; }   /* walked back */
+  89%       { transform: translateX(0) scaleX(-1);    opacity: 1; }   /* paused at home */
+  92%       { transform: translateX(0) scaleX(1);     opacity: 0; }   /* faces east + fades */
+  100%      { transform: translateX(0) scaleX(1);     opacity: 0; }   /* invisible until next cycle */
 }
 
 /* Per-city palette overrides — applied via data-city on a wrapper div.

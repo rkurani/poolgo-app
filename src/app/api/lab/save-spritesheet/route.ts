@@ -8,6 +8,28 @@ export const dynamic = "force-dynamic";
 
 const SPRITES_DIR = path.join(process.cwd(), "public", "assets", "canvas", "sprites");
 
+async function chromaKeyPurple(input: Buffer): Promise<Buffer> {
+  const img = sharp(input).ensureAlpha();
+  const { data, info } = await img.raw().toBuffer({ resolveWithObject: true });
+  const px = new Uint8ClampedArray(data);
+  for (let i = 0; i < px.length; i += 4) {
+    const r = px[i], g = px[i + 1], b = px[i + 2];
+    const rg = r - g;
+    const bg = b - g;
+    if (rg > 25 && bg > 25 && r < 180 && b < 180 && g < 120) {
+      px[i + 3] = 0; // fully transparent
+    } else if (rg > 12 && bg > 12 && g < 130 && r < 200 && b < 200) {
+      const strength = (rg + bg) / 2;
+      px[i + 3] = Math.max(0, 255 - Math.floor(strength * 6));
+    }
+  }
+  return await sharp(Buffer.from(px), {
+    raw: { width: info.width, height: info.height, channels: 4 },
+  })
+    .png()
+    .toBuffer();
+}
+
 /**
  * Save a walk-cycle as a single horizontal sprite sheet.
  * Input: array of data URLs (one per frame), all same size.
@@ -39,14 +61,19 @@ export async function POST(req: Request) {
       .slice(0, 60) || `walkcycle-${Date.now()}`;
 
   try {
-    // Decode each frame
+    // Decode each frame and strip the muted purple/magenta bg PixelLab leaves
+    // behind on animate-with-text output even with no_background:true set.
+    // Anything close to that purple tone (R+B both meaningfully higher than G)
+    // becomes transparent; fringe pixels get partial alpha.
     const buffers: Buffer[] = [];
     for (const dataUrl of frames) {
       const match = dataUrl.match(/^data:image\/(png|jpe?g|webp);base64,(.+)$/);
       if (!match) {
         return NextResponse.json({ error: "Invalid data URL in frames" }, { status: 400 });
       }
-      buffers.push(Buffer.from(match[2], "base64"));
+      const raw = Buffer.from(match[2], "base64");
+      const stripped = await chromaKeyPurple(raw);
+      buffers.push(stripped);
     }
 
     // Read metadata of the first frame to know size
