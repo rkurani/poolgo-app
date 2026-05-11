@@ -15,12 +15,18 @@ type Hotspot = {
 const STAGE_W = 2400;
 const STAGE_H = 1500;
 
+// Positions confirmed against the actual rendered redlands-macro.png:
+// - Pickup truck is on the LEFT side of the street (x:24, y:21)
+// - The guy on the lounger sits at x:30, y:45 on the wooden deck
+// - Pool centered at x:50, y:60
+// - Equipment pad bottom-right at x:78, y:75
+// - Leslie's storefront top-right at x:91, y:18
 const HOTSPOTS: Hotspot[] = [
-  { id: "pool",    x: 48, y: 60, label: "Today's water",                detail: "pH 7.4, ORP 720", href: "/care",                  status: "good" },
-  { id: "pad",     x: 78, y: 76, label: "The pad",                     detail: "5 systems, all live", href: "/equipment",         status: "good" },
-  { id: "lounger", x: 13, y: 60, label: "On the lounger",              detail: "Guest, 2:14pm", href: "/care", status: "human" },
-  { id: "truck",   x: 62, y: 11, label: "Carlos, 4 mins up the street",detail: "Routes nearby",       href: "/folks/carlos-redlands", status: "human" },
-  { id: "shop",    x: 92, y: 14, label: "Leslie's, 2 mi",              detail: "In stock now",       href: "/folks",                 status: "info" },
+  { id: "pool",    x: 50, y: 60, label: "Today's water",                detail: "pH 7.4, ORP 720",      href: "/care",                  status: "good" },
+  { id: "pad",     x: 78, y: 75, label: "The pad",                     detail: "5 systems, all live",  href: "/equipment",             status: "good" },
+  { id: "lounger", x: 30, y: 45, label: "On the lounger",              detail: "Guest, 2:14pm",        href: "/care",                  status: "human" },
+  { id: "truck",   x: 24, y: 21, label: "Carlos, 4 mins up the street",detail: "Routes nearby",        href: "/folks/carlos-redlands", status: "human" },
+  { id: "shop",    x: 91, y: 18, label: "Leslie's, 2 mi",              detail: "In stock now",        href: "/folks",                  status: "info" },
 ];
 
 const STATUS_COLOR: Record<Status, string> = {
