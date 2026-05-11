@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Droplet, Settings2, Users, Plug } from "lucide-react";
+import { House, Droplet, Settings2, Zap, Users, Plug } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { href: "/", label: "My Pool", Icon: House },
   { href: "/care", label: "Care", Icon: Droplet },
   { href: "/equipment", label: "Equipment", Icon: Settings2 },
+  { href: "/routines", label: "Routines", Icon: Zap },
   { href: "/folks", label: "Folks", Icon: Users },
   { href: "/connect", label: "Connect", Icon: Plug },
 ] as const;

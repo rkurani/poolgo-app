@@ -81,13 +81,14 @@ export default function HomePage() {
           <SectionHeader title="Today, at a glance." />
           <div className="grid grid-cols-3 gap-3 sm:gap-4">
             {[
-              { label: "Water", value: "pH 7.4", sub: "ORP 720", tone: "var(--color-source-ai)" },
-              { label: "Pad", value: "5/5 live", sub: "1,750 RPM", tone: "var(--color-source-live)" },
-              { label: "Next visit", value: "Tue 14", sub: "Carlos · 9 AM", tone: "var(--color-source-human)" },
+              { label: "Water", value: "pH 7.4", sub: "ORP 720", tone: "var(--color-source-ai)", href: "/care" },
+              { label: "Pad", value: "5/5 live", sub: "1,750 RPM", tone: "var(--color-source-live)", href: "/equipment" },
+              { label: "Next visit", value: "Tue 14", sub: "Carlos · 9 AM", tone: "var(--color-source-human)", href: "/folks/carlos-redlands" },
             ].map((s) => (
-              <div
+              <Link
                 key={s.label}
-                className="rounded-2xl border-2 p-4 sm:p-5 flex flex-col gap-1 relative overflow-hidden"
+                href={s.href}
+                className="rounded-2xl border-2 p-4 sm:p-5 flex flex-col gap-1 relative overflow-hidden hover:translate-y-[-2px] transition-transform"
                 style={{
                   backgroundColor: "var(--color-data-cream, #F1E6D3)",
                   borderColor: "var(--color-card-border, #B89B6A)",
@@ -113,7 +114,7 @@ export default function HomePage() {
                       style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
                   {s.sub}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </section>

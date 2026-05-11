@@ -14,6 +14,10 @@ const STATE_TONE: Record<string, string> = {
 
 const UNIT_HREF: Record<string, string> = {
   pump: "/equipment/intelliflo3",
+  filter: "/equipment/hayward-sand-filter",
+  heater: "/equipment/hayward-heater",
+  salt: "/equipment/intellichlor-ic40",
+  blower: "/equipment/blower",
 };
 
 export default function EquipmentPage() {
@@ -115,7 +119,7 @@ export default function EquipmentPage() {
 function UnitCard({ unit }: { unit: EquipmentTile }) {
   const tone = STATE_TONE[unit.state] || STATE_TONE.live;
   const href = UNIT_HREF[unit.id] || `/equipment`;
-  const isClickable = unit.id === "pump";
+  const isClickable = UNIT_HREF[unit.id] !== undefined;
 
   return (
     <Link

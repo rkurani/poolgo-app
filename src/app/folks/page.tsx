@@ -123,6 +123,7 @@ type Store = {
   logo: string | null;
   brandTone: string;
   brandSoft: string;
+  href: string;
 };
 
 const STORES: Store[] = [
@@ -137,6 +138,7 @@ const STORES: Store[] = [
     logo: "/assets/leslies.png",
     brandTone: "var(--color-leslies, #0046A8)",
     brandSoft: "var(--color-leslies-soft, #DEE8F7)",
+    href: "/connect/leslies-portal",
   },
   {
     id: "pinch-redlands",
@@ -149,6 +151,7 @@ const STORES: Store[] = [
     logo: null,
     brandTone: "var(--color-mountain-shadow, #5C5546)",
     brandSoft: "var(--color-data-cream-2, #E5D7BE)",
+    href: "/folks",
   },
 ];
 
@@ -157,13 +160,14 @@ type Specialist = {
   name: string;
   speciality: string;
   miles: string;
+  href: string;
 };
 
 const SPECIALISTS: Specialist[] = [
-  { id: "leak", name: "InfraScan Leak Detection", speciality: "Acoustic & pressure leak detection", miles: "5.6 mi" },
-  { id: "plaster", name: "Plaster Pros IE", speciality: "Plaster, tile, and coping", miles: "8.1 mi" },
-  { id: "heater", name: "Heater Doctor", speciality: "Raypak / Hayward heater repair", miles: "6.3 mi" },
-  { id: "leakcap", name: "Capleak Repair", speciality: "Skimmer-line crack injection", miles: "11.4 mi" },
+  { id: "leak", name: "InfraScan Leak Detection", speciality: "Acoustic & pressure leak detection", miles: "5.6 mi", href: "/folks" },
+  { id: "plaster", name: "Plaster Pros IE", speciality: "Plaster, tile, and coping", miles: "8.1 mi", href: "/folks/velasquez-build" },
+  { id: "heater", name: "Heater Doctor", speciality: "Raypak / Hayward heater repair", miles: "6.3 mi", href: "/folks/solcoast-pool-care" },
+  { id: "leakcap", name: "Capleak Repair", speciality: "Skimmer-line crack injection", miles: "11.4 mi", href: "/folks" },
 ];
 
 const CHIPS = [
@@ -263,9 +267,10 @@ export default function FolksPage() {
             }}
           >
             {SPECIALISTS.map((spec, i) => (
-              <div
+              <Link
                 key={spec.id}
-                className="flex items-center gap-4 px-5 py-4 border-b-2 last:border-b-0"
+                href={spec.href}
+                className="flex items-center gap-4 px-5 py-4 border-b-2 last:border-b-0 hover:bg-black/[0.02] transition-colors"
                 style={{ borderColor: "var(--color-card-border, #B89B6A)" }}
               >
                 <div
@@ -297,7 +302,7 @@ export default function FolksPage() {
                 >
                   {spec.miles}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -452,8 +457,9 @@ function ProAvatar({ pro }: { pro: Pro }) {
 
 function StoreCard({ store }: { store: Store }) {
   return (
-    <div
-      className="rounded-2xl border-[3px] p-5 flex flex-col gap-3"
+    <Link
+      href={store.href}
+      className="rounded-2xl border-[3px] p-5 flex flex-col gap-3 hover:translate-y-[-2px] transition-transform"
       style={{
         backgroundColor: "var(--color-data-cream, #F1E6D3)",
         borderColor: "var(--color-mountain-shadow, #5C5546)",
@@ -519,13 +525,13 @@ function StoreCard({ store }: { store: Store }) {
               }}>
           {store.badge}
         </span>
-        <button className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.08em]"
+        <span className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.08em]"
                 style={{ color: "var(--color-data-ink, #3B342A)" }}>
-          Get directions
+          Open
           <MapPin size={12} strokeWidth={2.5} />
-        </button>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
 

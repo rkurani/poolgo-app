@@ -5,10 +5,10 @@ import { SectionHeader } from "@/components/SectionHeader";
 import { GarageSection } from "@/components/care/GarageSection";
 
 const VITALS = [
-  { chem: "pH", value: "7.4", unit: "", target: "7.2–7.6", state: "in-range", source: "imported" },
-  { chem: "ORP", value: "720", unit: "mV", target: "650–750", state: "in-range", source: "live" },
-  { chem: "Free Cl", value: "2.4", unit: "ppm", target: "1–3", state: "in-range", source: "imported" },
-  { chem: "CYA", value: "42", unit: "ppm", target: "30–50", state: "climbing", source: "imported" },
+  { chem: "pH", value: "7.4", unit: "", target: "7.2–7.6", state: "in-range", source: "imported", href: "/connect/leslies-portal" },
+  { chem: "ORP", value: "720", unit: "mV", target: "650–750", state: "in-range", source: "live", href: "/connect/pentair-intellichlor" },
+  { chem: "Free Cl", value: "2.4", unit: "ppm", target: "1–3", state: "in-range", source: "imported", href: "/connect/leslies-portal" },
+  { chem: "CYA", value: "42", unit: "ppm", target: "30–50", state: "climbing", source: "imported", href: "/connect/leslies-portal" },
 ];
 
 const SOURCE_TONE: Record<string, string> = {
@@ -166,9 +166,10 @@ export default function CarePage() {
           <SectionHeader title="Right now." />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {VITALS.map((v) => (
-              <div
+              <Link
                 key={v.chem}
-                className="rounded-2xl border-2 p-4 sm:p-5 flex flex-col gap-1 relative overflow-hidden"
+                href={v.href}
+                className="rounded-2xl border-2 p-4 sm:p-5 flex flex-col gap-1 relative overflow-hidden hover:translate-y-[-2px] transition-transform"
                 style={{
                   backgroundColor: "var(--color-data-cream, #F1E6D3)",
                   borderColor: "var(--color-card-border, #B89B6A)",
@@ -208,7 +209,7 @@ export default function CarePage() {
                       style={{ color: "var(--color-data-ink-mute, #6E6555)" }}>
                   Target {v.target}
                 </span>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
