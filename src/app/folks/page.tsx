@@ -72,7 +72,7 @@ const PROS: Pro[] = [
     reviews: "63",
     status: { tone: "imported", text: "Booking Q3 · 2 slots open" },
     fleet: "4 trucks · 12 crew",
-    href: "/folks",
+    href: "/folks/velasquez-build",
   },
   {
     id: "redhawk",
@@ -90,7 +90,7 @@ const PROS: Pro[] = [
     reviews: "38",
     status: { tone: "live", text: "Mon · Fri routes" },
     fleet: "3 trucks · 5 cleaners",
-    href: "/folks",
+    href: "/folks/redhawk-pool-services",
   },
   {
     id: "solcoast",
@@ -108,7 +108,7 @@ const PROS: Pro[] = [
     reviews: "91",
     status: { tone: "imported", text: "On-call · 24h response" },
     fleet: "2 trucks · 6 techs",
-    href: "/folks",
+    href: "/folks/solcoast-pool-care",
   },
 ];
 

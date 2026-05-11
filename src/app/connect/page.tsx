@@ -11,10 +11,10 @@ import {
   Briefcase,
   Sparkles,
 } from "lucide-react";
-type Status = "connected" | "available" | "coming-soon";
-type Category = "pad" | "cleaner" | "monitor" | "tester" | "platform" | "specialty";
+export type Status = "connected" | "available" | "coming-soon";
+export type Category = "pad" | "cleaner" | "monitor" | "tester" | "platform" | "specialty";
 
-type Integration = {
+export type Integration = {
   id: string;
   name: string;
   vendor: string;
@@ -28,7 +28,7 @@ type Integration = {
   capabilities: string[];
 };
 
-const INTEGRATIONS: Integration[] = [
+export const INTEGRATIONS: Integration[] = [
   {
     id: "pentair-intellicenter",
     name: "IntelliCenter",
@@ -625,7 +625,8 @@ function CounterCard({ label, value, tone }: { label: string; value: number; ton
 function IntegrationCard({ integration }: { integration: Integration }) {
   const status = STATUS_TONE[integration.status];
   return (
-    <div
+    <Link
+      href={`/connect/${integration.id}`}
       className="group relative rounded-2xl border-2 p-5 flex flex-col gap-4 hover:translate-y-[-2px] transition-transform overflow-hidden"
       style={{
         backgroundColor: "var(--color-data-cream, #F1E6D3)",
@@ -699,7 +700,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
           <ArrowRight size={12} strokeWidth={2.5} />
         </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
