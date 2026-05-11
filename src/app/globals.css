@@ -174,6 +174,27 @@ button { font-family: inherit; cursor: pointer; }
   55% { opacity: 0.95; transform: scale(1); }
 }
 
+/* Walk-cycle for a 4-frame sprite sheet (256x64, frames 0..3 at x=0,64,128,192).
+   steps(4, start) yields the four discrete frames evenly across the duration. */
+@keyframes walkCycle4 {
+  from { background-position: 0 0; }
+  to   { background-position: -256px 0; }
+}
+
+/* Path for the lounger guest: walks right along the deck, pauses, turns,
+   walks back, pauses, turns to face forward. Translate values are in canvas
+   pixels (the canvas is the 2400x1500 stage). 28-second loop. */
+@keyframes loungerGuestWalkPath {
+  0%   { transform: translateX(0) scaleX(1); }
+  32%  { transform: translateX(560px) scaleX(1); }   /* walked right */
+  37%  { transform: translateX(560px) scaleX(1); }   /* pause at destination */
+  41%  { transform: translateX(560px) scaleX(-1); }  /* turn around */
+  73%  { transform: translateX(0) scaleX(-1); }      /* walked back */
+  78%  { transform: translateX(0) scaleX(-1); }      /* pause at home */
+  82%  { transform: translateX(0) scaleX(1); }       /* turn to face forward */
+  100% { transform: translateX(0) scaleX(1); }       /* rest before next loop */
+}
+
 /* Per-city palette overrides — applied via data-city on a wrapper div.
    See iterations.md "Local-page pixel-art generation as SEO moat" for
    the architecture context. */

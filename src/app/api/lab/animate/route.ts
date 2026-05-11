@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { PixelLabClient, Base64Image } from "@pixellab-code/pixellab";
+import sharp from "sharp";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const SPRITES_DIR = path.join(process.cwd(), "public", "assets", "canvas", "sprites");
+const PIXELLAB_BASE = "https://api.pixellab.ai/v1";
 
 type Body = {
   description?: string;
   action?: string;
-  referenceFileId?: string; // canonical id of the master sprite
+  referenceFileId?: string;
   size?: number;
   nFrames?: number;
-  view?: "side" | "low top-down" | "high top-down";
-  direction?: "south" | "east" | "north" | "west";
+  view?: string;
+  direction?: string;
 };
 
 export async function POST(req: Request) {
@@ -40,30 +42,68 @@ export async function POST(req: Request) {
   }
   const refId = (body.referenceFileId || "").replace(/[^a-z0-9-_]/gi, "");
   if (!refId) {
-    return NextResponse.json(
-      { error: "referenceFileId is required (id of the master sprite on disk)" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "referenceFileId required" }, { status: 400 });
   }
-  const size = Math.max(32, Math.min(400, Number(body.size) || 96));
+  // animateWithText caps frame size at 64x64 (server limit), regardless of
+  // master sprite size. Force this regardless of caller intent.
+  const size = 64;
   const nFrames = Math.max(2, Math.min(20, Number(body.nFrames) || 4));
 
   try {
     const refPath = path.join(SPRITES_DIR, `${refId}.png`);
-    const referenceImage = await Base64Image.fromFile(refPath);
+    const buf = await readFile(refPath);
+    // PixelLab's animate-with-text requires reference == frame size (64x64).
+    // Downscale the master sprite to 64 via sharp with nearest-neighbor so
+    // we keep the chunky pixel edges sharp instead of blurring.
+    const resized = await sharp(buf)
+      .resize(size, size, { kernel: "nearest", fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toBuffer();
+    const referenceBase64 = resized.toString("base64");
 
-    const client = new PixelLabClient(key);
-    const response = await client.animateWithText({
-      imageSize: { width: size, height: size },
+    // Direct API call so we see the raw response body on validation errors
+    const requestData = {
+      image_size: { width: size, height: size },
       description,
       action,
-      referenceImage,
       view: body.view || "side",
       direction: body.direction || "east",
-      nFrames,
+      n_frames: nFrames,
+      reference_image: { type: "base64", base64: referenceBase64, format: "png" },
+    };
+
+    const resp = await fetch(`${PIXELLAB_BASE}/animate-with-text`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
     });
 
-    const frames = response.images.map((img) => img.dataUrl);
+    if (!resp.ok) {
+      let detail: unknown;
+      try {
+        detail = await resp.json();
+      } catch {
+        detail = await resp.text();
+      }
+      // Show the real PixelLab API error in the response
+      return NextResponse.json(
+        {
+          error: `PixelLab ${resp.status} ${resp.statusText}`,
+          detail,
+        },
+        { status: resp.status }
+      );
+    }
+
+    const data = await resp.json();
+    const frames: string[] = (data.images || []).map(
+      (img: { base64: string; format?: string }) =>
+        `data:image/${img.format || "png"};base64,${img.base64}`
+    );
+
     return NextResponse.json({
       frames,
       nFrames: frames.length,
@@ -71,9 +111,10 @@ export async function POST(req: Request) {
       description,
       action,
       referenceFileId: refId,
+      usage: data.usage,
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "unknown error";
+    const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
