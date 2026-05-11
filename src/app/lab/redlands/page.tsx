@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Sparkles, Download, Wand2, Loader2, RefreshCw, Check, ChevronLeft, Eye } from "lucide-react";
-import { REDLANDS_LIBRARY, fullPrompt, type LibraryEntry, type LibraryCategory } from "@/lib/lab/redlands-library";
+import { REDLANDS_LIBRARY, masterPrompt, variantPrompt, type LibraryEntry, type LibraryCategory } from "@/lib/lab/redlands-library";
 
 type CardState = {
   status: "idle" | "generating" | "preview" | "saved" | "error";
@@ -56,12 +56,39 @@ export default function RedlandsLibraryPage() {
   }, [checkExisting]);
 
   async function generateOne(entry: LibraryEntry) {
+    // Variants need their master saved to disk first
+    if (entry.kind === "variant" && entry.master) {
+      const masterState = states[entry.master];
+      if (masterState?.status !== "saved") {
+        setStates((prev) => ({
+          ...prev,
+          [entry.id]: { status: "error", error: `Save the master "${entry.master}" first.` },
+        }));
+        return;
+      }
+    }
+
     setStates((prev) => ({ ...prev, [entry.id]: { status: "generating" } }));
     try {
+      const payload =
+        entry.kind === "variant" && entry.master
+          ? {
+              prompt: variantPrompt(entry),
+              size: entry.size,
+              mode: "bitforge" as const,
+              styleFileId: entry.master,
+              styleStrength: 70,
+            }
+          : {
+              prompt: masterPrompt(entry),
+              size: entry.size,
+              mode: "pixflux" as const,
+            };
+
       const res = await fetch("/api/lab/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: fullPrompt(entry), size: entry.size }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Generation failed");
@@ -207,6 +234,10 @@ export default function RedlandsLibraryPage() {
                   key={entry.id}
                   entry={entry}
                   state={states[entry.id] || { status: "idle" }}
+                  masterReady={entry.kind === "variant" && entry.master
+                    ? states[entry.master]?.status === "saved"
+                    : true
+                  }
                   onGenerate={() => generateOne(entry)}
                   onSave={() => saveOne(entry)}
                   onRegenerate={() => generateOne(entry)}
@@ -223,22 +254,26 @@ export default function RedlandsLibraryPage() {
 function SpriteCard({
   entry,
   state,
+  masterReady,
   onGenerate,
   onSave,
   onRegenerate,
 }: {
   entry: LibraryEntry;
   state: CardState;
+  masterReady: boolean;
   onGenerate: () => void;
   onSave: () => void;
   onRegenerate: () => void;
 }) {
+  const blocked = entry.kind === "variant" && !masterReady;
   return (
     <div
       className="relative rounded-2xl border-2 p-4 flex flex-col gap-3 overflow-hidden"
       style={{
         backgroundColor: "var(--color-data-cream, #F1E6D3)",
         borderColor: state.status === "saved" ? "var(--color-source-live)" : "var(--color-card-border, #B89B6A)",
+        opacity: blocked ? 0.6 : 1,
       }}
     >
       <span
@@ -258,18 +293,45 @@ function SpriteCard({
 
       <div className="flex items-start justify-between gap-2 mt-1">
         <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-          <span
-            className="font-pixel text-[9px] uppercase tracking-[0.18em]"
-            style={{ color: "var(--color-mountain-shadow, #5C5546)" }}
-          >
-            {entry.id}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span
+              className="font-pixel text-[9px] uppercase tracking-[0.18em]"
+              style={{ color: "var(--color-mountain-shadow, #5C5546)" }}
+            >
+              {entry.id}
+            </span>
+            {entry.kind === "master" ? (
+              <span
+                className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.1em]"
+                style={{ backgroundColor: "var(--color-citrus, #E8A82C)", color: "var(--color-mountain-shadow, #5C5546)" }}
+                title="Master sprite, generated from text"
+              >
+                Master
+              </span>
+            ) : (
+              <span
+                className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.1em]"
+                style={{ backgroundColor: "var(--color-pentair, #1A4F8B)", color: "white" }}
+                title={`Variant of ${entry.master}, generated via Bitforge using the master as reference`}
+              >
+                Variant
+              </span>
+            )}
+          </div>
           <span
             className="text-[15px] font-extrabold tracking-[-0.005em] leading-tight"
             style={{ color: "var(--color-data-ink, #3B342A)" }}
           >
             {entry.name}
           </span>
+          {entry.kind === "variant" && entry.master && (
+            <span
+              className="text-[10px] font-semibold"
+              style={{ color: "var(--color-data-ink-mute, #6E6555)" }}
+            >
+              from {entry.master}
+            </span>
+          )}
         </div>
         {state.status === "saved" && (
           <div
@@ -351,11 +413,13 @@ function SpriteCard({
             <button
               type="button"
               onClick={onGenerate}
-              className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em]"
+              disabled={blocked}
+              className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ backgroundColor: "var(--color-mountain-shadow, #5C5546)", color: "white" }}
+              title={blocked ? `Save the master "${entry.master}" first` : ""}
             >
               <Wand2 size={12} strokeWidth={2.5} />
-              Generate
+              {blocked ? "Master first" : "Generate"}
             </button>
           )}
           {state.status === "preview" && (
