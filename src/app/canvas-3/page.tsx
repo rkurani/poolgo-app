@@ -66,21 +66,8 @@ export default function Canvas3Page() {
           aria-hidden
         />
 
-        {/* z-15 — pool water shimmer, sits on top of the pool area in the bg */}
-        <div
-          className="absolute z-[15] bg-no-repeat bg-contain mix-blend-screen pointer-events-none"
-          style={{
-            left: "32%",
-            top: "62%",
-            width: "30%",
-            height: "8%",
-            backgroundImage: "url(/assets/canvas/layers/pool-shimmer.png)",
-            imageRendering: "pixelated",
-            opacity: 0.55,
-            animation: "shimmerPulse 4.5s ease-in-out infinite",
-          }}
-          aria-hidden
-        />
+        {/* z-15 — pool water sparkles, inline SVG twinkles scattered on the pool */}
+        <PoolSparkles />
 
         {/* z-18 — chimney smoke from a distant house */}
         <div
@@ -151,14 +138,14 @@ export default function Canvas3Page() {
           />
         </div>
 
-        {/* z-22 — orange tree, foreground near deck, gentle leaf sway */}
+        {/* z-22 — orange tree, sits between pool and equipment pad (clear of lounger) */}
         <div
           className="absolute z-[22]"
           style={{
-            left: "4%",
-            top: "30%",
-            width: "16%",
-            height: "55%",
+            left: "64%",
+            top: "22%",
+            width: "13%",
+            height: "48%",
             animation: "treeSway 6s ease-in-out infinite",
             transformOrigin: "50% 95%",
             animationDelay: "0.7s",
@@ -189,23 +176,24 @@ export default function Canvas3Page() {
           />
         </div>
 
-        {/* z-21 — bougainvillea cascading the right fence */}
+        {/* z-21 — bougainvillea vine cascading over the back fence (anchored above
+            the existing fence in the base, no second fence rendered) */}
         <div
           className="absolute z-[21]"
           style={{
-            left: "44%",
-            top: "12%",
-            width: "26%",
-            height: "20%",
+            left: "42%",
+            top: "8%",
+            width: "22%",
+            height: "18%",
             animation: "bougainSway 9s ease-in-out infinite",
-            transformOrigin: "50% 95%",
+            transformOrigin: "50% 100%",
           }}
           aria-hidden
         >
           <div
-            className="h-full w-full bg-no-repeat bg-contain bg-bottom"
+            className="h-full w-full bg-no-repeat bg-contain bg-top"
             style={{
-              backgroundImage: "url(/assets/canvas/layers/bougainvillea.png)",
+              backgroundImage: "url(/assets/canvas/layers/bougainvillea-vine.png)",
               imageRendering: "pixelated",
             }}
           />
@@ -258,6 +246,49 @@ export default function Canvas3Page() {
           ← original canvas
         </Link>
       </div>
+    </div>
+  );
+}
+
+/**
+ * PoolSparkles: scattered chunky white pixels on the pool surface that
+ * twinkle in and out on their own timers. Replaces the rectangular shimmer
+ * overlay which read as a tiled box rather than ambient sparkle.
+ */
+function PoolSparkles() {
+  // Pool zone approx x: 32-66%, y: 56-78%
+  const sparkles = [
+    { x: 36, y: 62, delay: 0.0, dur: 3.6 },
+    { x: 41, y: 68, delay: 1.4, dur: 4.2 },
+    { x: 47, y: 60, delay: 0.7, dur: 3.0 },
+    { x: 52, y: 71, delay: 2.1, dur: 4.5 },
+    { x: 56, y: 65, delay: 1.0, dur: 3.4 },
+    { x: 60, y: 73, delay: 2.8, dur: 4.0 },
+    { x: 44, y: 75, delay: 0.4, dur: 3.8 },
+    { x: 50, y: 58, delay: 1.7, dur: 3.2 },
+    { x: 38, y: 70, delay: 2.4, dur: 4.4 },
+    { x: 58, y: 60, delay: 0.9, dur: 3.7 },
+    { x: 54, y: 64, delay: 1.6, dur: 4.1 },
+    { x: 42, y: 72, delay: 2.3, dur: 3.5 },
+  ];
+  return (
+    <div className="absolute inset-0 z-[15] pointer-events-none" aria-hidden>
+      {sparkles.map((s, i) => (
+        <span
+          key={i}
+          className="absolute block"
+          style={{
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            width: 6,
+            height: 6,
+            backgroundColor: "white",
+            opacity: 0,
+            boxShadow: "0 0 6px rgba(255,255,255,0.85)",
+            animation: `sparkleTwinkle ${s.dur}s ease-in-out ${s.delay}s infinite`,
+          }}
+        />
+      ))}
     </div>
   );
 }
