@@ -20,6 +20,11 @@ function isActive(pathname: string, href: string) {
 
 export function TopNav() {
   const pathname = usePathname();
+  // Tenant-skinned consumer routes carry their own chrome via TenantHeader.
+  if (pathname.startsWith("/r/")) return null;
+  // Marketing page (/), the consumer demo index (/demo), and the public-facing
+  // surfaces ship their own nav. TopNav is only for the internal prototype.
+  if (pathname === "/" || pathname === "/demo") return null;
   return (
     <nav className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-background px-8 py-4">
       <Link href="/" className="text-[18px] font-bold tracking-[-0.03em]">

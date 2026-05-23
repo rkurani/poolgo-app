@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>PoolGo · Platform Design System (draft)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ---------- Tokens (shared with Pure) ---------- */
+    :root {
+      --bg: #FFFFFF;
+      --surface: #FAFAFA;
+      --surface-2: #F5F5F4;
+      --line: #ECECEC;
+      --line-2: #D8D8D8;
+      --ink: #0F1115;
+      --ink-soft: #45494F;
+      --ink-mute: #6B7079;
+      --on-ink: #FFFFFF;
+      --primary: #1FA0BF;
+      --primary-soft: #E2F3F8;
+
+      /* ---------- Platform-only tokens ---------- */
+      --status-live: #22A559;
+      --status-live-soft: #DFF1E3;
+      --status-coming: #B07B00;
+      --status-coming-soft: #F8EFD6;
+      --status-open: #1FA0BF;
+      --status-open-soft: #E2F3F8;
+      --status-deprecated: #C75240;
+      --status-deprecated-soft: #F8E2DD;
+
+      --data-1: #1FA0BF; /* cyan */
+      --data-2: #22A559; /* green */
+      --data-3: #6B7079; /* slate */
+      --data-4: #B07B00; /* amber */
+      --data-5: #5E4FB0; /* violet */
+      --data-6: #C75240; /* coral */
+
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 10px;
+
+      --shadow-sm: 0 1px 2px rgba(15,17,21,0.05);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--ink);
+      background: var(--surface);
+      font-feature-settings: "tnum";
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--ink); text-decoration: none; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace; font-size: 12.5px; }
+
+    /* ---------- Page chrome ---------- */
+    header.page {
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 10;
+    }
+    header.page .brand {
+      font-size: 17px; font-weight: 800; letter-spacing: -0.025em;
+    }
+    header.page .brand b { color: var(--primary); }
+    header.page .meta {
+      font-size: 12px; color: var(--ink-mute);
+      display: flex; gap: 14px;
+    }
+    header.page .meta .pill {
+      background: var(--primary-soft); color: var(--primary);
+      padding: 2px 8px; border-radius: 999px; font-weight: 600;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+    section {
+      padding: 36px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    section:last-child { border-bottom: 0; }
+    .eyebrow {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.16em;
+      color: var(--ink-mute);
+      margin-bottom: 8px;
+    }
+    h2 {
+      font-size: 22px; font-weight: 700; letter-spacing: -0.025em;
+      margin: 0 0 4px;
+    }
+    .lede {
+      font-size: 14px; color: var(--ink-soft);
+      max-width: 56ch; margin: 0 0 22px;
+    }
+    h3 {
+      font-size: 13px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--ink-mute);
+      margin: 24px 0 10px;
+    }
+
+    /* ---------- Section: Color ---------- */
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .swatch {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .swatch .chip {
+      height: 56px;
+    }
+    .swatch .label {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    .swatch .label .name { font-weight: 700; color: var(--ink); }
+    .swatch .label .hex { color: var(--ink-mute); font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11.5px; }
+
+    /* ---------- Section: Type ---------- */
+    .type-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 120px;
+      align-items: baseline;
+      gap: 16px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+    }
+    .type-row:first-of-type { border-top: 0; }
+    .type-row .tag {
+      font-size: 11px; color: var(--ink-mute);
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .type-row .spec {
+      font-size: 11.5px; color: var(--ink-mute);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+    }
+    .t-display    { font-size: 38px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; }
+    .t-headline   { font-size: 24px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
+    .t-subhead    { font-size: 18px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.2; }
+    .t-body       { font-size: 14px; font-weight: 400; line-height: 1.55; }
+    .t-body-bold  { font-size: 14px; font-weight: 600; line-height: 1.55; }
+    .t-caption    { font-size: 12.5px; color: var(--ink-mute); }
+    .t-label-caps { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-mute); }
+    .t-mono       { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13px; }
+
+    /* ---------- Section: Density comparison ---------- */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .compare .pane {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .compare .pane .pane-head {
+      padding: 8px 14px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--ink-mute);
+    }
+    .compare .pane .pane-body { padding: 18px; }
+
+    .pure-style { font-family: "Inter Tight", sans-serif; font-size: 16px; line-height: 1.6; }
+    .pure-style h4 { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 8px; }
+    .pure-style p { color: var(--ink-soft); margin: 0; }
+    .platform-style { font-size: 14px; line-height: 1.5; }
+    .platform-style h4 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 6px; }
+    .platform-style p { color: var(--ink-soft); margin: 0; font-size: 13px; }
+
+    /* ---------- Section: Layout primitive ---------- */
+    .dashboard-mock {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .dashboard-mock .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      padding: 18px 0;
+    }
+    .dashboard-mock .sidebar .sb-brand {
+      padding: 0 16px 12px;
+      font-weight: 800; letter-spacing: -0.025em;
+    }
+    .dashboard-mock .sidebar .sb-brand b { color: var(--primary); }
+    .dashboard-mock .sidebar .sb-section {
+      padding: 14px 16px 6px;
+      font-size: 10.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--ink-mute);
+    }
+    .dashboard-mock .sidebar .sb-link {
+      padding: 5px 16px;
+      font-size: 12.5px; font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .dashboard-mock .sidebar .sb-link.active {
+      background: var(--surface-2);
+      color: var(--ink);
+      font-weight: 600;
+      box-shadow: inset 2px 0 0 var(--primary);
+    }
+    .dashboard-mock .main {
+      padding: 22px 24px;
+    }
+    .dashboard-mock .main .mh1 {
+      font-size: 19px; font-weight: 700; letter-spacing: -0.02em;
+      margin: 0 0 16px;
+    }
+    .dashboard-mock .main .table {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .dashboard-mock .main .tr {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 0.8fr 1fr;
+      padding: 9px 14px;
+      font-size: 12.5px;
+      border-top: 1px solid var(--line);
+    }
+    .dashboard-mock .main .tr.thead {
+      background: var(--surface);
+      font-size: 10.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--ink-mute);
+      border-top: 0;
+    }
+    .dashboard-mock .main .tr .mono { color: var(--ink-soft); }
+
+    /* ---------- Section: Components ---------- */
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* Status pill */
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .pill::before {
+      content: ""; display: inline-block;
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .pill.live { background: var(--status-live-soft); color: var(--status-live); }
+    .pill.live::before { background: var(--status-live); }
+    .pill.coming { background: var(--status-coming-soft); color: var(--status-coming); }
+    .pill.coming::before { background: var(--status-coming); }
+    .pill.open { background: var(--status-open-soft); color: var(--status-open); }
+    .pill.open::before { background: var(--status-open); }
+    .pill.deprecated { background: var(--status-deprecated-soft); color: var(--status-deprecated); }
+    .pill.deprecated::before { background: var(--status-deprecated); }
+
+    /* ConnectorCard */
+    .connector {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
+      padding: 14px 14px 12px;
+      display: flex; flex-direction: column; gap: 6px;
+      transition: border-color 100ms ease;
+    }
+    .connector:hover { border-color: var(--line-2); }
+    .connector .top {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+    }
+    .connector .logo {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: var(--surface-2);
+      display: grid; place-items: center;
+      font-size: 12px; font-weight: 800;
+      color: var(--ink-mute);
+    }
+    .connector .name { font-weight: 700; font-size: 14px; }
+    .connector .category {
+      font-size: 11px; color: var(--ink-mute);
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+    }
+    .connector .desc { font-size: 12.5px; color: var(--ink-soft); }
+
+    /* Dense connector grid (marketing-page style) */
+    .conn-grid-dense {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px;
+    }
+    .conn-tile {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      padding: 11px 12px;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .conn-tile .logo-sm {
+      width: 22px; height: 22px;
+      border-radius: 4px;
+      background: var(--surface-2);
+      display: grid; place-items: center;
+      font-size: 10px; font-weight: 800;
+      color: var(--ink-mute);
+    }
+    .conn-tile .info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .conn-tile .info .n { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conn-tile .info .s { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+    .conn-tile.live .info .s { color: var(--status-live); }
+    .conn-tile.coming .info .s { color: var(--status-coming); }
+    .conn-tile.open .info .s { color: var(--status-open); }
+
+    /* Stat strip */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .stat {
+      padding: 16px 18px;
+      border-right: 1px solid var(--line);
+    }
+    .stat:last-child { border-right: 0; }
+    .stat .v {
+      font-size: 24px; font-weight: 800; letter-spacing: -0.025em;
+      color: var(--ink);
+    }
+    .stat .l {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--ink-mute);
+      margin-top: 4px;
+    }
+
+    /* Voice comparison */
+    .voice-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 1fr;
+      gap: 16px;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+      align-items: baseline;
+    }
+    .voice-row:first-of-type { border-top: 0; }
+    .voice-row .ctx {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--ink-mute);
+    }
+    .voice-row .pure-v { font-size: 14.5px; color: var(--ink); }
+    .voice-row .plat-v { font-size: 13px; color: var(--ink-soft); }
+    .vh-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 1fr;
+      gap: 16px;
+      padding-bottom: 8px;
+    }
+    .vh-row .h {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--ink-mute);
+    }
+
+    /* Diagram */
+    .diagram {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr 60px 1fr;
+      gap: 0;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 22px 16px;
+    }
+    .diagram .col {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .diagram .col .lbl {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--ink-mute);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .diagram .node {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 6px 10px;
+      font-size: 12px; font-weight: 600;
+      text-align: center;
+    }
+    .diagram .node.center {
+      background: var(--primary);
+      color: var(--on-ink);
+      border-color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      padding: 12px 10px;
+    }
+    .diagram .arrow {
+      text-align: center;
+      color: var(--ink-mute);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+    }
+
+    /* Notes block */
+    .notes {
+      background: var(--primary-soft);
+      border: 1px solid #B4DDE6;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #0a5f73;
+    }
+    .notes strong { color: #074654; }
+  </style>
+</head>
+<body>
+  <header class="page">
+    <div class="brand">PoolGo<b>.</b> Platform Design System</div>
+    <div class="meta">
+      <span class="pill">DRAFT v0.1</span>
+      <span>Pair with DESIGN.md (Pure brand)</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===================== Scope ===================== -->
+    <section>
+      <div class="eyebrow">Scope</div>
+      <h2>What this system covers</h2>
+      <p class="lede">
+        The middleware side of PoolGo. Five surfaces, all sharing a B2B/infrastructure
+        mood, none of them homeowner-facing. <strong>Pure</strong> stays for the consumer side
+        (Care, Equipment, Aggregator, partner-skinned consumer landings). Anything an
+        operator, developer, or partner sees logged-out or logged-in lives here.
+      </p>
+      <div class="conn-grid-dense" style="grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));">
+        <div class="conn-tile"><div class="logo-sm">M</div><div class="info"><div class="n">Marketing site</div><div class="s" style="color: var(--status-live)">poolgo.co/</div></div></div>
+        <div class="conn-tile"><div class="logo-sm">C</div><div class="info"><div class="n">Connectors catalog</div><div class="s" style="color: var(--status-coming)">/connectors</div></div></div>
+        <div class="conn-tile"><div class="logo-sm">D</div><div class="info"><div class="n">Partner dashboard</div><div class="s" style="color: var(--status-coming)">/app</div></div></div>
+        <div class="conn-tile"><div class="logo-sm">A</div><div class="info"><div class="n">Developer docs</div><div class="s" style="color: var(--status-coming)">/docs</div></div></div>
+        <div class="conn-tile"><div class="logo-sm">I</div><div class="info"><div class="n">Internal admin</div><div class="s" style="color: var(--status-coming)">(private)</div></div></div>
+      </div>
+    </section>
+
+    <!-- ===================== Color ===================== -->
+    <section>
+      <div class="eyebrow">Color</div>
+      <h2>Tokens — shared with Pure + new for Platform</h2>
+      <p class="lede">Same base tokens as <span class="mono">DESIGN.md</span>. Adds a status palette and a data-viz palette. PoolGo cyan stays the brand anchor — used sparingly on the platform side.</p>
+
+      <h3>Shared base (from Pure)</h3>
+      <div class="swatches">
+        <div class="swatch"><div class="chip" style="background: #FFFFFF; border-bottom: 1px solid var(--line)"></div><div class="label"><div class="name">background</div><div class="hex">#FFFFFF</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #FAFAFA"></div><div class="label"><div class="name">surface</div><div class="hex">#FAFAFA</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #F5F5F4"></div><div class="label"><div class="name">surface-2</div><div class="hex">#F5F5F4</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #0F1115"></div><div class="label"><div class="name">ink</div><div class="hex">#0F1115</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #45494F"></div><div class="label"><div class="name">ink-soft</div><div class="hex">#45494F</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #6B7079"></div><div class="label"><div class="name">ink-mute</div><div class="hex">#6B7079</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #1FA0BF"></div><div class="label"><div class="name">primary</div><div class="hex">#1FA0BF</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #E2F3F8"></div><div class="label"><div class="name">primary-soft</div><div class="hex">#E2F3F8</div></div></div>
+      </div>
+
+      <h3>Platform-only — status palette</h3>
+      <div class="swatches">
+        <div class="swatch"><div class="chip" style="background: #22A559"></div><div class="label"><div class="name">status-live</div><div class="hex">#22A559</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #B07B00"></div><div class="label"><div class="name">status-coming</div><div class="hex">#B07B00</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #1FA0BF"></div><div class="label"><div class="name">status-open</div><div class="hex">#1FA0BF</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #C75240"></div><div class="label"><div class="name">status-deprecated</div><div class="hex">#C75240</div></div></div>
+      </div>
+
+      <h3>Platform-only — data viz palette</h3>
+      <div class="swatches">
+        <div class="swatch"><div class="chip" style="background: #1FA0BF"></div><div class="label"><div class="name">data-1</div><div class="hex">#1FA0BF</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #22A559"></div><div class="label"><div class="name">data-2</div><div class="hex">#22A559</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #6B7079"></div><div class="label"><div class="name">data-3</div><div class="hex">#6B7079</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #B07B00"></div><div class="label"><div class="name">data-4</div><div class="hex">#B07B00</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #5E4FB0"></div><div class="label"><div class="name">data-5</div><div class="hex">#5E4FB0</div></div></div>
+        <div class="swatch"><div class="chip" style="background: #C75240"></div><div class="label"><div class="name">data-6</div><div class="hex">#C75240</div></div></div>
+      </div>
+    </section>
+
+    <!-- ===================== Type ===================== -->
+    <section>
+      <div class="eyebrow">Typography</div>
+      <h2>Denser scale for dashboards and docs</h2>
+      <p class="lede">Inter Tight stays. Body is 14px (Pure is 15–16px). Tighter line-height. JetBrains Mono for tabular and code surfaces. <strong>Tabular figures on</strong>.</p>
+
+      <div class="type-row"><div class="tag">Display</div><div class="t-display">Pool industry, connected.</div><div class="spec">38 / 800 / -0.035em</div></div>
+      <div class="type-row"><div class="tag">Headline</div><div class="t-headline">Connect hardware, software, and stores.</div><div class="spec">24 / 700 / -0.025em</div></div>
+      <div class="type-row"><div class="tag">Subhead</div><div class="t-subhead">Branded customer communication for every pool business.</div><div class="spec">18 / 700 / -0.015em</div></div>
+      <div class="type-row"><div class="tag">Body</div><div class="t-body">Branded SMS and email for every pool business. Stores send through their own number and domain. We handle delivery, replies, opt-outs, and compliance.</div><div class="spec">14 / 400</div></div>
+      <div class="type-row"><div class="tag">Body-bold</div><div class="t-body-bold">Branded SMS and email for every pool business.</div><div class="spec">14 / 600</div></div>
+      <div class="type-row"><div class="tag">Caption</div><div class="t-caption">Per-store onboarding takes ~5 minutes. SOC 2 in progress.</div><div class="spec">12.5 / 400 / ink-mute</div></div>
+      <div class="type-row"><div class="tag">Label-caps</div><div class="t-label-caps">Trusted by the pool industry</div><div class="spec">11 / 700 / 0.16em uppercase</div></div>
+      <div class="type-row"><div class="tag">Mono</div><div class="t-mono">POST /v1/tests { customerId, ph, chlorine }</div><div class="spec">13 / 400 / JetBrains Mono</div></div>
+    </section>
+
+    <!-- ===================== Density compare ===================== -->
+    <section>
+      <div class="eyebrow">Density</div>
+      <h2>Pure vs Platform — same message, different mood</h2>
+      <p class="lede">Pure is generous and storytelling. Platform is dense and dispassionate. Same brand, different audiences.</p>
+      <div class="compare">
+        <div class="pane">
+          <div class="pane-head">Pure (consumer)</div>
+          <div class="pane-body pure-style">
+            <h4>Your CYA is climbing.</h4>
+            <p>We tested your water on Apr 27 and the cyanuric acid is high enough to start blocking chlorine from doing its job. Here's the fix.</p>
+          </div>
+        </div>
+        <div class="pane">
+          <div class="pane-head">Platform (operator)</div>
+          <div class="pane-body platform-style">
+            <h4>12 customers · CYA &gt; 80 ppm</h4>
+            <p>Detected in the last 14 days. 4 already booked re-tests. 8 unread. <a href="#" style="color: var(--primary); font-weight: 600;">View segment →</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Layout primitive ===================== -->
+    <section>
+      <div class="eyebrow">Layout</div>
+      <h2>Sidebar + main is the dashboard primitive</h2>
+      <p class="lede">Every logged-in platform surface uses this. Sidebar carries product nav, main holds working surface. Sticky page header optional.</p>
+
+      <div class="dashboard-mock">
+        <div class="sidebar">
+          <div class="sb-brand">PoolGo<b style="color: var(--primary)">.</b></div>
+          <div class="sb-section">Overview</div>
+          <div class="sb-link active">Dashboard</div>
+          <div class="sb-link">Deliveries</div>
+          <div class="sb-link">Customers</div>
+          <div class="sb-section">Build</div>
+          <div class="sb-link">Connectors</div>
+          <div class="sb-link">Webhooks</div>
+          <div class="sb-link">API keys</div>
+          <div class="sb-section">Settings</div>
+          <div class="sb-link">Brand</div>
+          <div class="sb-link">Team</div>
+          <div class="sb-link">Billing</div>
+        </div>
+        <div class="main">
+          <div class="mh1">Recent deliveries</div>
+          <div class="table">
+            <div class="tr thead">
+              <div>Customer</div>
+              <div>Source</div>
+              <div>Status</div>
+              <div>Sent</div>
+            </div>
+            <div class="tr">
+              <div>Glenn Beck</div>
+              <div class="mono">clearcare+</div>
+              <div><span class="pill live">Delivered</span></div>
+              <div class="mono">2m ago</div>
+            </div>
+            <div class="tr">
+              <div>Maria Vargas</div>
+              <div class="mono">clearcare+</div>
+              <div><span class="pill open">Opened</span></div>
+              <div class="mono">14m ago</div>
+            </div>
+            <div class="tr">
+              <div>Jordan Patel</div>
+              <div class="mono">clearcare+</div>
+              <div><span class="pill live">Delivered</span></div>
+              <div class="mono">38m ago</div>
+            </div>
+            <div class="tr">
+              <div>Sue Hartman</div>
+              <div class="mono">clearcare+</div>
+              <div><span class="pill deprecated">Bounced</span></div>
+              <div class="mono">1h ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Components ===================== -->
+    <section>
+      <div class="eyebrow">Components</div>
+      <h2>Vocabulary the platform shares across every surface</h2>
+      <p class="lede">Five primitives that show up everywhere: status pill, connector card (two densities), stat strip, partner logo, network diagram.</p>
+
+      <h3>Status pills</h3>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span class="pill live">Live</span>
+        <span class="pill coming">Coming</span>
+        <span class="pill open">Open</span>
+        <span class="pill deprecated">Deprecated</span>
+      </div>
+
+      <h3>Connector card — descriptive (for catalog + dashboard)</h3>
+      <div class="grid-3">
+        <div class="connector">
+          <div class="top">
+            <div class="logo">CC</div>
+            <span class="pill live">Live</span>
+          </div>
+          <div class="category">Chemistry · photometer</div>
+          <div class="name">ClearCare+ by Solenis</div>
+          <div class="desc">Water test results, chemistry recommendations, and dosing plans pushed directly from in-store photometers.</div>
+        </div>
+        <div class="connector">
+          <div class="top">
+            <div class="logo">SK</div>
+            <span class="pill coming">Coming</span>
+          </div>
+          <div class="category">Service tech app</div>
+          <div class="name">Skimmer</div>
+          <div class="desc">Route visits, service notes, and photos from every pool a tech serves, linked to the homeowner's record.</div>
+        </div>
+        <div class="connector">
+          <div class="top">
+            <div class="logo">PE</div>
+            <span class="pill open">Open</span>
+          </div>
+          <div class="category">Pool equipment · pump</div>
+          <div class="name">Pentair Connected</div>
+          <div class="desc">Pump telemetry, run schedules, and salt cell status from Pentair-connected hardware in the homeowner's pool.</div>
+        </div>
+      </div>
+
+      <h3>Connector tile — dense (for marketing logo bar)</h3>
+      <div class="conn-grid-dense">
+        <div class="conn-tile live"><div class="logo-sm">CC</div><div class="info"><div class="n">ClearCare+</div><div class="s">Live</div></div></div>
+        <div class="conn-tile coming"><div class="logo-sm">SK</div><div class="info"><div class="n">Skimmer</div><div class="s">Coming</div></div></div>
+        <div class="conn-tile coming"><div class="logo-sm">PB</div><div class="info"><div class="n">Pool Brain</div><div class="s">Coming</div></div></div>
+        <div class="conn-tile coming"><div class="logo-sm">PR</div><div class="info"><div class="n">Pool Route Ops</div><div class="s">Coming</div></div></div>
+        <div class="conn-tile coming"><div class="logo-sm">CP</div><div class="info"><div class="n">Counter POS</div><div class="s">Coming</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">PE</div><div class="info"><div class="n">Pentair</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">HW</div><div class="info"><div class="n">Hayward</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">PO</div><div class="info"><div class="n">Polaris</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">JA</div><div class="info"><div class="n">Jandy</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">RP</div><div class="info"><div class="n">Raypak</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">LE</div><div class="info"><div class="n">Leslie's</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">PP</div><div class="info"><div class="n">Pinch-a-Penny</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">SC</div><div class="info"><div class="n">Sun Country</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">QB</div><div class="info"><div class="n">QuickBooks</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">LR</div><div class="info"><div class="n">Lightspeed Retail</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">HW</div><div class="info"><div class="n">Hayward Omni</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">IA</div><div class="info"><div class="n">iAquaLink</div><div class="s">Open</div></div></div>
+        <div class="conn-tile open"><div class="logo-sm">IT</div><div class="info"><div class="n">IntelliCenter</div><div class="s">Open</div></div></div>
+      </div>
+
+      <h3>Stat strip</h3>
+      <div class="stat-strip">
+        <div class="stat"><div class="v">1</div><div class="l">Live connector</div></div>
+        <div class="stat"><div class="v">62</div><div class="l">Pool industry partners on the roadmap</div></div>
+        <div class="stat"><div class="v">~500K</div><div class="l">Homeowners reachable today</div></div>
+        <div class="stat"><div class="v">1 platform</div><div class="l">For hardware, software, and stores</div></div>
+      </div>
+
+      <h3>Network diagram — how it works</h3>
+      <div class="diagram">
+        <div class="col">
+          <div class="lbl">Hardware</div>
+          <div class="node">Photometers</div>
+          <div class="node">Pentair pumps</div>
+          <div class="node">Hayward cells</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="col" style="gap: 14px;">
+          <div class="lbl">PoolGo</div>
+          <div class="node center">Middleware<br/>infrastructure</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="col">
+          <div class="lbl">Surfaces</div>
+          <div class="node">Branded SMS / Email</div>
+          <div class="node">Homeowner record</div>
+          <div class="node">Operator dashboards</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Voice ===================== -->
+    <section>
+      <div class="eyebrow">Voice</div>
+      <h2>Same brand, two registers</h2>
+      <p class="lede">Pure speaks to homeowners — plain-spoken, warm, leads with the customer's pool. Platform speaks to operators and developers — dispassionate, precise, leads with the metric or the API.</p>
+
+      <div class="vh-row">
+        <div class="h">Context</div>
+        <div class="h">Pure</div>
+        <div class="h">Platform</div>
+      </div>
+
+      <div class="voice-row">
+        <div class="ctx">Headline</div>
+        <div class="pure-v">Your pool's record, kept current by everyone you trust.</div>
+        <div class="plat-v">The connector platform the pool industry runs on.</div>
+      </div>
+      <div class="voice-row">
+        <div class="ctx">Why us</div>
+        <div class="pure-v">We're the only place your tests, equipment, and visits all live together.</div>
+        <div class="plat-v">Connect once. Reach every pool owner. Keep your brand on the envelope.</div>
+      </div>
+      <div class="voice-row">
+        <div class="ctx">Error</div>
+        <div class="pure-v">Hmm, we couldn't pull your latest test. Try again in a minute.</div>
+        <div class="plat-v">Delivery failed: SMTP 421 from upstream. Will retry in 60s.</div>
+      </div>
+      <div class="voice-row">
+        <div class="ctx">Empty state</div>
+        <div class="pure-v">No tests yet. Once Royal Pools tests your water, you'll see it here.</div>
+        <div class="plat-v">No deliveries in the last 7 days. Start a campaign from Compose.</div>
+      </div>
+
+      <div class="notes" style="margin-top: 18px;">
+        <strong>Hard rules (carry from global Ravi style guide):</strong> No em-dashes — use commas, periods, or rewrite. No exclamation points. No "we believe" / "our mission" pablum. Short sentences. Numbers preferred over adjectives.
+      </div>
+    </section>
+
+    <!-- ===================== Discipline ===================== -->
+    <section>
+      <div class="eyebrow">Discipline</div>
+      <h2>Don'ts — what keeps Pure and Platform from blurring</h2>
+      <div class="grid-2">
+        <div>
+          <h3 style="margin-top: 0; color: var(--ink);">Don't (on Platform)</h3>
+          <ul style="font-size: 13.5px; color: var(--ink-soft); padding-left: 18px; margin: 0;">
+            <li style="margin: 6px 0;">Use pool photography. Network and data graphics only.</li>
+            <li style="margin: 6px 0;">Use Pure's loose 16px body. 14px and tabular.</li>
+            <li style="margin: 6px 0;">Use the OEM color cascade (<span class="mono">data-brand</span>). That's a Pure cascade only — it's how the consumer side reads provenance per card.</li>
+            <li style="margin: 6px 0;">Talk to the homeowner. Every word on Platform is addressed to operators or developers.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin-top: 0; color: var(--ink);">Do (on Platform)</h3>
+          <ul style="font-size: 13.5px; color: var(--ink-soft); padding-left: 18px; margin: 0;">
+            <li style="margin: 6px 0;">Use the status palette. Every state has one of four meanings.</li>
+            <li style="margin: 6px 0;">Lean on tables, dense lists, and stat strips. Density = trust.</li>
+            <li style="margin: 6px 0;">Use the network diagram convention (Hardware → PoolGo → Surfaces). Repeat it across surfaces so it becomes a brand asset.</li>
+            <li style="margin: 6px 0;">Show real numbers. "62 partners on the roadmap" beats "growing ecosystem."</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
